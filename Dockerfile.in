@@ -21,14 +21,14 @@ RUN apt-get install -y --no-install-recommends \
 
 WORKDIR /src
 
-RUN wget -q "https://www.kernel.org/pub/linux/kernel/v3.x/${LINUX_VERSION}.tar.xz"
-RUN wget -q "https://ftp.gnu.org/gnu/gmp/${GMP_VERSION}.tar.bz2"
-RUN wget -q "https://ftp.gnu.org/gnu/mpfr/${MPFR_VERSION}.tar.gz"
-RUN wget -q "https://ftp.gnu.org/gnu/mpc/${MPC_VERSION}.tar.gz"
-RUN wget -q "https://ftp.gnu.org/gnu/glibc/${GLIBC_VERSION}.tar.gz"
-RUN wget -q "https://ftp.gnu.org/gnu/gcc/${GCC_VERSION}/${GCC_VERSION}.tar.gz"
-RUN wget -q "https://ftp.gnu.org/gnu/binutils/${BINUTILS_VERSION}.tar.gz"
-RUN wget -q "https://www.musl-libc.org/releases/${MUSL_VERSION}.tar.gz"
+RUN wget -q "ftp://www.kernel.org/pub/linux/kernel/v3.x/${LINUX_VERSION}.tar.xz"
+RUN wget -q "ftp://ftp.gnu.org/gnu/gmp/${GMP_VERSION}.tar.bz2"
+RUN wget -q "ftp://ftp.gnu.org/gnu/mpfr/${MPFR_VERSION}.tar.gz"
+RUN wget -q "ftp://ftp.gnu.org/gnu/mpc/${MPC_VERSION}.tar.gz"
+RUN wget -q "ftp://ftp.gnu.org/gnu/glibc/${GLIBC_VERSION}.tar.gz"
+RUN wget -q "ftp://ftp.gnu.org/gnu/gcc/${GCC_VERSION}/${GCC_VERSION}.tar.gz"
+RUN wget -q "ftp://ftp.gnu.org/gnu/binutils/${BINUTILS_VERSION}.tar.gz"
+RUN wget -q "http://www.musl-libc.org/releases/${MUSL_VERSION}.tar.gz"
 RUN wget -q "ftp://gcc.gnu.org/pub/gcc/infrastructure/${ISL_VERSION}.tar.bz2"
 RUN wget -q "ftp://gcc.gnu.org/pub/gcc/infrastructure/${CLOOG_VERSION}.tar.gz"
 

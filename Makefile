@@ -35,14 +35,16 @@ clean:
 
 all: armv7 x86 x64
 
-.sh.in.armv7.sh: env.docker
+.sh.in.armv7.sh:
 	cpp -DCHROMEBREW_ARMV7 -Ulinux -P -E $< | sed -e 's:ENV \([^ ]*\) :\1=:' > $@
 
-.sh.in.x86.sh: env.docker
+.sh.in.x86.sh:
 	cpp -DCHROMEBREW_X86 -Ulinux -P -E $< | sed -e 's:ENV \([^ ]*\) :\1=:' > $@
 
-.sh.in.x64.sh: env.docker
+.sh.in.x64.sh:
 	cpp -DCHROMEBREW_X64 -Ulinux -P -E $< | sed -e 's:ENV \([^ ]*\) :\1=:' > $@
+
+${PACKAGES_ARMV7} ${PACKAGES_X86} ${PACKAGES_X64}: env.docker
 
 .armv7.sh.armv7:
 	docker run -it --rm -v $(PWD):/work -v $(PWD)/dist:/dist $(ORG)/cross-armv7 /bin/bash /work/$<
@@ -67,6 +69,9 @@ cross: cross-armv7 cross-x86 cross-x64
 
 cross-armv7: cross-armv7/Dockerfile
 	docker build -t $(ORG)/cross-armv7 \
+	       --build-arg http_proxy=$(http_proxy) \
+	       --build-arg https_proxy=$(https_proxy) \
+	       --build-arg ftp_proxy=$(ftp_proxy) \
 		cross-armv7
 
 cross-armv7/Dockerfile: Dockerfile.in env.docker
@@ -75,6 +80,9 @@ cross-armv7/Dockerfile: Dockerfile.in env.docker
 
 cross-x86: cross-x86/Dockerfile
 	docker build -t $(ORG)/cross-x86 \
+	       --build-arg http_proxy=$(http_proxy) \
+	       --build-arg https_proxy=$(https_proxy) \
+	       --build-arg ftp_proxy=$(ftp_proxy) \
 		cross-x86
 
 cross-x86/Dockerfile: Dockerfile.in env.docker
@@ -83,6 +91,9 @@ cross-x86/Dockerfile: Dockerfile.in env.docker
 
 cross-x64: cross-x64/Dockerfile
 	docker build -t $(ORG)/cross-x64 \
+	       --build-arg http_proxy=$(http_proxy) \
+	       --build-arg https_proxy=$(https_proxy) \
+	       --build-arg ftp_proxy=$(ftp_proxy) \
 		cross-x64
 
 cross-x64/Dockerfile: Dockerfile.in env.docker
