@@ -1,0 +1,42 @@
+// native compilation
+
+#include "../env.docker"
+
+// prepare create_package script
+
+cd /${CROS_HOST_DEST}
+wget -q -O - "https://raw.github.com/skycocker/chromebrew/master/create_package.sh" | sed -e 's:czf:cJf:' -e 's:.gz:.xz:g' > create_package.sh
+
+// build directories
+
+mkdir -p /build/gcc
+
+// gcc and musl
+
+pkgname=${GCC_VERSION}-chromeos-${CROS_PKG_ARCH}
+cd /build/gcc
+/src/${GCC_VERSION}/configure \
+        --prefix=${CROS_TARGET_PREFIX} \
+        --build=${CROS_HOST} \
+        --host=${CROS_TARGET} \
+        --target=${CROS_TARGET} \
+        --enable-languages=c,c++ \
+        ${CROS_NATIVE_GCC_OPT} \
+        && make -j ${CROS_CORES} \
+        && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install
+export CC=${CROS_TARGET}-gcc
+export CROSS_COMPILE=${CROS_TARGET}-
+cd /src/${MUSL_VERSION}
+./configure \
+        --prefix=${CROS_TARGET_PREFIX} \
+        --build=${CROS_HOST} \
+        --host=${CROS_TARGET} \
+        --target=${CROS_TARGET} \
+        && make -j ${CROS_CORES} \
+        && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install
+// fix musl wrapper
+rm -rf ${CROS_HOST_DEST}/${pkgname}/lib
+sed -i "s/lib\/${CROS_MUSL_NAME}/usr\/local\/lib\/libc.so/g" ${CROS_HOST_DEST}/${pkgname}/usr/local/lib/musl-gcc.specs
+mv ${CROS_HOST_DEST}/${pkgname}/usr/local/bin/gcc ${CROS_HOST_DEST}/${pkgname}/usr/local/bin/gcc-original
+mv ${CROS_HOST_DEST}/${pkgname}/usr/local/bin/musl-gcc ${CROS_HOST_DEST}/${pkgname}/usr/local/bin/gcc
+cd /${CROS_HOST_DEST}/${pkgname}; sh ../create_package.sh; rm -rf /${CROS_HOST_DEST}/${pkgname}

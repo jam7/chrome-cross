@@ -1,0 +1,26 @@
+// native compilation
+
+#include "../env.docker"
+
+// prepare create_package script
+
+cd /${CROS_HOST_DEST}
+wget -q -O - "https://raw.github.com/skycocker/chromebrew/master/create_package.sh" | sed -e 's:czf:cJf:' -e 's:.gz:.xz:g' > create_package.sh
+
+// build directories
+
+mkdir -p /build/binutils
+
+// binutils
+
+pkgname=${BINUTILS_VERSION}-chromeos-${CROS_PKG_ARCH}
+cd /build/binutils
+/src/${BINUTILS_VERSION}/configure \
+        --prefix=${CROS_TARGET_PREFIX} \
+        --build=${CROS_HOST} \
+        --host=${CROS_TARGET} \
+        --target=${CROS_TARGET} \
+        ${CROS_NATIVE_GCC_OPT} \
+        && make -j ${CROS_CORES} \
+        && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install
+cd /${CROS_HOST_DEST}/${pkgname}; sh ../create_package.sh; rm -rf /${CROS_HOST_DEST}/${pkgname}
