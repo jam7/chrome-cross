@@ -7,7 +7,12 @@
 cd /${CROS_HOST_DEST}
 wget -q -O - "https://raw.github.com/skycocker/chromebrew/master/create_package.sh" | sed -e 's:czf:cJf:' -e 's:.gz:.xz:g' > create_package.sh
 
-// build directories
+// prepare sources
+
+mkdir /src
+cd /src
+wget -q "ftp://www.kernel.org/pub/linux/kernel/v3.x/${LINUX_VERSION}.tar.xz"
+for f in *.tar*; do tar xfk $f; done
 
 // linux-headers
 

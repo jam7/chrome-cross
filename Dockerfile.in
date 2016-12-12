@@ -1,7 +1,6 @@
 FROM debian:jessie
 
-RUN apt-get update
-RUN apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y --no-install-recommends \
         bzip2 \
         ca-certificates \
         file \
@@ -13,8 +12,10 @@ RUN apt-get install -y --no-install-recommends \
         perl \
         texinfo \
         wget \
-        xz-utils
+        xz-utils \
+     && rm -rf /var/cache/apt/archives /var/lib/apt/lists
 
+ARG NPROCS
 #include "env.docker"
 
 // get sources
@@ -92,5 +93,7 @@ RUN make -j ${CROS_CORES} && make install
 WORKDIR /build/gcc
 RUN make -j ${CROS_CORES} all && make install
 
+WORKDIR /
+RUN rm -rf /src
 RUN rm -rf /build
 
