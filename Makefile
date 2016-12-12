@@ -23,7 +23,7 @@ usage:
 .SUFFIXES: .sh.in .armv7.sh .x86.sh .x64.sh .armv7 .x86 .x64
 
 clean:
-	rm -f *.armv7.sh *.x86.sh *.x64.sh
+	rm -f packages/*.armv7.sh packages/*.x86.sh packages/*.x64.sh
 	rm -rf cross-armv7 cross-x86 cross-x64
 
 #
