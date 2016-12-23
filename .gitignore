@@ -1,7 +1,4 @@
 /dist*
-/cross-armv7
-/cross-x86
-/cross-x64
 *.armv7.sh
 *.x86.sh
 *.x64.sh

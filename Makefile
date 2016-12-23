@@ -70,42 +70,44 @@ x64: $(PACKAGES_X64) $(PACKAGES_RUN_X64)
 
 cross: cross-armv7 cross-x86 cross-x64
 
-cross-armv7: cross-armv7/Dockerfile
+cross-armv7: cross-armv7/image
+cross-armv7/image:cross-armv7/Dockerfile
 	docker build -t $(ORG)/cross-armv7 \
 	       --build-arg http_proxy=$(http_proxy) \
 	       --build-arg https_proxy=$(https_proxy) \
 	       --build-arg ftp_proxy=$(ftp_proxy) \
 	       --build-arg NPROCS=$(NPROCS) \
 		cross-armv7
-
+	touch $@
 cross-armv7/Dockerfile: Dockerfile.in env.docker
-	-mkdir cross-armv7
 	cpp -DCHROMEBREW_ARMV7 -Ulinux -P -o $@ Dockerfile.in
 
-cross-x86: cross-x86/Dockerfile
+cross-x86: cross-x86/image
+cross-x86/image: cross-x86/Dockerfile
 	docker build -t $(ORG)/cross-x86 \
 	       --build-arg http_proxy=$(http_proxy) \
 	       --build-arg https_proxy=$(https_proxy) \
 	       --build-arg ftp_proxy=$(ftp_proxy) \
 	       --build-arg NPROCS=$(NPROCS) \
 		cross-x86
-
+	touch $@
+cross-armv7/Dockerfile: Dockerfile.in env.docker
 cross-x86/Dockerfile: Dockerfile.in env.docker
-	-mkdir cross-x86
 	cpp -DCHROMEBREW_X86 -Ulinux -P -o $@ Dockerfile.in
 
-cross-x64: cross-x64/Dockerfile
+cross-x64: cross-x64/image
+cross-x64/image: cross-x64/Dockerfile
 	docker build -t $(ORG)/cross-x64 \
 	       --build-arg http_proxy=$(http_proxy) \
 	       --build-arg https_proxy=$(https_proxy) \
 	       --build-arg ftp_proxy=$(ftp_proxy) \
 	       --build-arg NPROCS=$(NPROCS) \
 		cross-x64
-
+	touch $@
+cross-armv7/Dockerfile: Dockerfile.in env.docker
 cross-x64/Dockerfile: Dockerfile.in env.docker
-	-mkdir cross-x64
 	cpp -DCHROMEBREW_X64 -Ulinux -P -o $@ Dockerfile.in
 
 
 FORCE:
-.PHONY: all clean FORCE armv7 x86 x64 cross cross-armv7 cross-x86 cross-x64
+.PHONY: all clean FORCE armv7 x86 x64 cross
