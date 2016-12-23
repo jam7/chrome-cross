@@ -1,0 +1,115 @@
+// native compilation
+
+#include "../env.docker"
+
+// prepare create_package script
+
+cd /${CROS_HOST_DEST}
+wget -q -O - "https://raw.github.com/skycocker/chromebrew/master/create_package.sh" | sed -e 's:czf:cJf:' -e 's:.gz:.xz:g' > create_package.sh
+
+// prepare sources
+
+mkdir /src
+cd /src
+wget -q "ftp://ftp.gnu.org/gnu/glibc/${GLIBC_VERSION}.tar.gz"
+for f in *.tar*; do tar xfk $f; done
+
+// glibc
+
+pkgname=${GLIBC_VERSION}-chromeos-${CROS_PKG_ARCH}
+mkdir -p /build/glibc
+cd /build/glibc
+/src/${GLIBC_VERSION}/configure \
+        --prefix=${CROS_TARGET_PREFIX} \
+        --build=${CROS_HOST} \
+        --host=${CROS_TARGET} \
+        --target=${CROS_TARGET} \
+        ${CROS_NATIVE_GCC_OPT} \
+        --disable-sanity-checks \
+        && make -j ${CROS_CORES} \
+        && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install
+
+// adjust libraries alived already in system
+
+cd /${CROS_HOST_DEST}/${pkgname}
+
+#ifdef CHROMEBREW_ARMV7
+rm usr/local/lib/ld-linux-armhf.so.3
+ln -s /lib/ld-linux-armhf.so.3 usr/local/lib/ld-linux-armhf.so.3
+
+LIB=lib
+#define NO_BROKENLOCALE                 // no libBrokenLocale in system, so leave it as is
+#define NO_MEMUSAGE                     // no libmemusage in system, so leave it as is
+#define NO_PCPROFILE                    // no libpcprofile in system, so leave it as is
+#define NO_SEGFAULT                     // no libSegFault in system, so leave it as is
+#endif
+#ifdef CHROMEBREW_X86
+rm usr/local/lib/ld-linux.so.2
+ln -s /lib/ld-linux.so.2 usr/local/lib/ld-linux.so.2
+
+LIB=lib
+#endif
+#ifdef CHROMEBREW_X64
+rm usr/local/lib/ld-linux-x86-64.so.2
+ln -s /lib64/ld-linux-x86-64.so.2 usr/local/lib/ld-linux-x86-64.so.2
+
+LIB=lib64
+#endif
+
+rm usr/local/lib/libanl.so.1
+ln -s /${LIB}/libanl.so.1 usr/local/lib/libanl.so.1
+#ifndef NO_BROKENLOCALE
+rm usr/local/lib/libBrokenLocale.so.1
+ln -s /${LIB}/libBrokenLocale.so.1 usr/local/lib/libBrokenLocale.so.1
+#endif
+rm usr/local/lib/libcidn.so.1
+ln -s /${LIB}/libcidn.so.1 usr/local/lib/libcidn.so.1
+rm usr/local/lib/libcrypt.so.1
+ln -s /${LIB}/libcrypt.so.1 usr/local/lib/libcrypt.so.1
+rm usr/local/lib/libc.so.6
+ln -s /${LIB}/libc.so.6 usr/local/lib/libc.so.6
+rm usr/local/lib/libdl.so.2
+ln -s /${LIB}/libdl.so.2 usr/local/lib/libdl.so.2
+#ifndef NO_MEMUSAGE
+rm usr/local/lib/libmemusage.so
+ln -s /${LIB}/libmemusage.so usr/local/lib/libmemusage.so
+#endif
+rm usr/local/lib/libm.so.6
+ln -s /${LIB}/libm.so.6 usr/local/lib/libm.so.6
+rm usr/local/lib/libnsl.so.1
+ln -s /${LIB}/libnsl.so.1 usr/local/lib/libnsl.so.1
+rm usr/local/lib/libnss_compat.so.2
+ln -s /${LIB}/libnss_compat.so.2 usr/local/lib/libnss_compat.so.2
+rm usr/local/lib/libnss_db.so.2
+ln -s /${LIB}/libnss_db.so.2 usr/local/lib/libnss_db.so.2
+rm usr/local/lib/libnss_dns.so.2
+ln -s /${LIB}/libnss_dns.so.2 usr/local/lib/libnss_dns.so.2
+rm usr/local/lib/libnss_files.so.2
+ln -s /${LIB}/libnss_files.so.2 usr/local/lib/libnss_files.so.2
+rm usr/local/lib/libnss_hesiod.so.2
+ln -s /${LIB}/libnss_hesiod.so.2 usr/local/lib/libnss_hesiod.so.2
+rm usr/local/lib/libnss_nisplus.so.2
+ln -s /${LIB}/libnss_nisplus.so.2 usr/local/lib/libnss_nisplus.so.2
+rm usr/local/lib/libnss_nis.so.2
+ln -s /${LIB}/libnss_nis.so.2 usr/local/lib/libnss_nis.so.2
+#ifndef NO_PCPROFILE
+rm usr/local/lib/libpcprofile.so
+ln -s /${LIB}/libpcprofile.so usr/local/lib/libpcprofile.so
+#endif
+rm usr/local/lib/libpthread.so.0
+ln -s /${LIB}/libpthread.so.0 usr/local/lib/libpthread.so.0
+rm usr/local/lib/libresolv.so.2
+ln -s /${LIB}/libresolv.so.2 usr/local/lib/libresolv.so.2
+rm usr/local/lib/librt.so.1
+ln -s /${LIB}/librt.so.1 usr/local/lib/librt.so.1
+#ifndef NO_SEGFAULT
+rm usr/local/lib/libSegFault.so
+ln -s /${LIB}/libSegFault.so usr/local/lib/libSegFault.so
+#endif
+rm usr/local/lib/libthread_db-1.0.so
+ln -s /${LIB}/libthread_db-1.0.so usr/local/lib/libthread_db-1.0.so
+rm usr/local/lib/libthread_db.so.1
+ln -s /${LIB}/libthread_db.so.1 usr/local/lib/libthread_db.so.1
+rm usr/local/lib/libutil.so.1
+ln -s /${LIB}/libutil.so.1 usr/local/lib/libutil.so.1
+cd /${CROS_HOST_DEST}/${pkgname}; sh ../create_package.sh; rm -rf /${CROS_HOST_DEST}/${pkgname}

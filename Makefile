@@ -1,7 +1,7 @@
 ORG = chromebrew
 NPROCS = `nproc`
 
-PACKAGES = linux-headers binutils gcc
+PACKAGES = linux-headers binutils gcc glibc
 PACKAGES_ARMV7 = $(PACKAGES:%=packages/%.armv7.sh)
 PACKAGES_X86 = $(PACKAGES:%=packages/%.x86.sh)
 PACKAGES_X64 = $(PACKAGES:%=packages/%.x64.sh)

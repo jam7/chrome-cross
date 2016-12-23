@@ -1,14 +1,17 @@
 FROM debian:jessie
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
+        autoconf \
+        bison \
         bzip2 \
         ca-certificates \
         file \
+        flex \
         g++ \
         gawk \
         gettext \
         gcc \
-        make \
+        git \
         perl \
         texinfo \
         wget \
@@ -17,6 +20,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 ARG NPROCS
 #include "env.docker"
+
+// get make 3.82
+
+WORKDIR /src
+RUN wget -q "ftp://ftp.gnu.org/gnu/make/make-3.82.tar.bz2" \
+ && tar xpf make-3.82.tar.bz2 \
+ && cd make-3.82 \
+ && ./configure --prefix=/usr \
+ && ./build.sh \
+ && ./make install \
+ && cd .. \
+ && rm -rf make-3.82 make-3.82.tar.bz2
 
 // get sources
 
@@ -27,9 +42,8 @@ RUN wget -q "ftp://ftp.gnu.org/gnu/gmp/${GMP_VERSION}.tar.bz2"
 RUN wget -q "ftp://ftp.gnu.org/gnu/mpfr/${MPFR_VERSION}.tar.gz"
 RUN wget -q "ftp://ftp.gnu.org/gnu/mpc/${MPC_VERSION}.tar.gz"
 RUN wget -q "ftp://ftp.gnu.org/gnu/glibc/${GLIBC_VERSION}.tar.gz"
-RUN wget -q "ftp://ftp.gnu.org/gnu/gcc/${GCC_VERSION}/${GCC_VERSION}.tar.gz"
-RUN wget -q "ftp://ftp.gnu.org/gnu/binutils/${BINUTILS_VERSION}.tar.gz"
-RUN wget -q "http://www.musl-libc.org/releases/${MUSL_VERSION}.tar.gz"
+RUN git clone -b ${CHROMIUM_VERSION} --depth 1 "https://chromium.googlesource.com/chromiumos/third_party/gcc" ${GCC_VERSION}
+RUN git clone -b ${CHROMIUM_VERSION} --depth 1 "https://chromium.googlesource.com/chromiumos/third_party/binutils" ${BINUTILS_VERSION}
 RUN wget -q "ftp://gcc.gnu.org/pub/gcc/infrastructure/${ISL_VERSION}.tar.bz2"
 RUN wget -q "ftp://gcc.gnu.org/pub/gcc/infrastructure/${CLOOG_VERSION}.tar.gz"
 

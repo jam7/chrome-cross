@@ -11,15 +11,14 @@ wget -q -O - "https://raw.github.com/skycocker/chromebrew/master/create_package.
 
 mkdir /src
 cd /src
-wget -q "ftp://ftp.gnu.org/gnu/binutils/${BINUTILS_VERSION}.tar.gz"
-for f in *.tar*; do tar xfk $f; done
+git clone -b ${CHROMIUM_VERSION} --depth 1 "https://chromium.googlesource.com/chromiumos/third_party/binutils" ${BINUTILS_VERSION}
 
 // binutils
 
 pkgname=${BINUTILS_VERSION}-chromeos-${CROS_PKG_ARCH}
 mkdir -p /build/binutils
 cd /build/binutils
-/src/${BINUTILS_VERSION}/configure \
+CFLAGS="-Wno-error=array-bounds" /src/${BINUTILS_VERSION}/configure \
         --prefix=${CROS_TARGET_PREFIX} \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
