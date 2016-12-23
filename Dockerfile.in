@@ -44,17 +44,13 @@ RUN wget -q "ftp://ftp.gnu.org/gnu/mpc/${MPC_VERSION}.tar.gz"
 RUN wget -q "ftp://ftp.gnu.org/gnu/glibc/${GLIBC_VERSION}.tar.gz"
 RUN git clone -b ${CHROMIUM_VERSION} --depth 1 "https://chromium.googlesource.com/chromiumos/third_party/gcc" ${GCC_VERSION}
 RUN git clone -b ${CHROMIUM_VERSION} --depth 1 "https://chromium.googlesource.com/chromiumos/third_party/binutils" ${BINUTILS_VERSION}
-RUN wget -q "ftp://gcc.gnu.org/pub/gcc/infrastructure/${ISL_VERSION}.tar.bz2"
-RUN wget -q "ftp://gcc.gnu.org/pub/gcc/infrastructure/${CLOOG_VERSION}.tar.gz"
 
 RUN for f in *.tar*; do tar xfk $f; done
 
 RUN cd /src/${GCC_VERSION} \
         && ln -s ../${GMP_VERSION} gmp \
         && ln -s ../${MPFR_VERSION} mpfr \
-        && ln -s ../${MPC_VERSION} mpc \
-        && ln -s ../${ISL_VERSION} isl \
-        && ln -s ../${CLOOG_VERSION} cloog
+        && ln -s ../${MPC_VERSION} mpc
 
 // cross
 
