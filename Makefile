@@ -45,16 +45,25 @@ ${PACKAGES_ARMV7} ${PACKAGES_X86} ${PACKAGES_X64}: env.docker
 
 .armv7.sh.armv7:
 	docker run -it --rm -v $(PWD):/work -v $(PWD)/dist:/dist \
+		-e http_proxy=${http_proxy} \
+		-e https_proxy=${https_proxy} \
+		-e ftp_proxy=${ftp_proxy} \
 		-e NPROCS=${NPROCS} \
 		$(ORG)/cross-armv7 /bin/bash /work/$<
 
 .x86.sh.x86:
 	docker run -it --rm -v $(PWD):/work -v $(PWD)/dist:/dist \
+		-e http_proxy=${http_proxy} \
+		-e https_proxy=${https_proxy} \
+		-e ftp_proxy=${ftp_proxy} \
 		-e NPROCS=${NPROCS} \
 		$(ORG)/cross-x86 /bin/bash /work/$<
 
 .x64.sh.x64:
 	docker run -it --rm -v $(PWD):/work -v $(PWD)/dist:/dist \
+		-e http_proxy=${http_proxy} \
+		-e https_proxy=${https_proxy} \
+		-e ftp_proxy=${ftp_proxy} \
 		-e NPROCS=${NPROCS} \
 		$(ORG)/cross-x64 /bin/bash /work/$<
 
