@@ -1,4 +1,4 @@
-/dist*
+/dist-*
 *.armv7.sh
 *.x86.sh
 *.x64.sh
