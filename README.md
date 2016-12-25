@@ -24,6 +24,13 @@ It is possible to cross-compiling environment also be following commands.
 
     make cross-armv7 | cross-x86 | cross-x64 | cross
 
+Packages
+--------
+
+Made following packages for armv7, x86 and x64.
+
+    linuxheaders, binutils, glibc, gmp, mpfr, mpc and gcc
+
 Other usage
 -----------
 

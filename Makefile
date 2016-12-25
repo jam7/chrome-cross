@@ -24,7 +24,7 @@ usage:
 
 clean:
 	rm -f packages/*.armv7.sh packages/*.x86.sh packages/*.x64.sh
-	rm -f cross-armv7/* cross-x86/* cross-x64/* dist/*
+	rm -rf cross-armv7/* cross-x86/* cross-x64/* dist/*
 
 #
 # Create compiled packages by
