@@ -1,13 +1,13 @@
-ORG = chromebrew
+ORG = jam7
 NPROCS = `nproc`
 
 PACKAGES = linux-headers binutils gcc glibc
 PACKAGES_ARMV7 = $(PACKAGES:%=packages/%.armv7.sh)
 PACKAGES_X86 = $(PACKAGES:%=packages/%.x86.sh)
 PACKAGES_X64 = $(PACKAGES:%=packages/%.x64.sh)
-PACKAGES_RUN_ARMV7 = $(PACKAGES:%=packages/%.armv7)
-PACKAGES_RUN_X86 = $(PACKAGES:%=packages/%.x86)
-PACKAGES_RUN_X64 = $(PACKAGES:%=packages/%.x64)
+TRIGGER_ARMV7 = $(PACKAGES:%=packages/%.armv7)
+TRIGGER_X86 = $(PACKAGES:%=packages/%.x86)
+TRIGGER_X64 = $(PACKAGES:%=packages/%.x64)
 
 usage:
 	@echo
@@ -24,7 +24,7 @@ usage:
 
 clean:
 	rm -f packages/*.armv7.sh packages/*.x86.sh packages/*.x64.sh
-	rm -rf cross-armv7 cross-x86 cross-x64
+	rm -f cross-armv7/* cross-x86/* cross-x64/* dist/*
 
 #
 # Create compiled packages by
@@ -67,11 +67,15 @@ ${PACKAGES_ARMV7} ${PACKAGES_X86} ${PACKAGES_X64}: env.docker
 		-e NPROCS=${NPROCS} \
 		$(ORG)/cross-x64 /bin/bash /work/$<
 
-armv7: $(PACKAGES_ARMV7) $(PACKAGES_RUN_ARMV7)
+armv7: $(PACKAGES_ARMV7) $(TRIGGER_ARMV7)
 
-x86: $(PACKAGES_X86) $(PACKAGES_RUN_X86)
+x86: $(PACKAGES_X86) $(TRIGGER_X86)
 
-x64: $(PACKAGES_X64) $(PACKAGES_RUN_X64)
+x64: $(PACKAGES_X64) $(TRIGGER_X64)
+
+${TRIGGER_ARMV7} armv7: cross-armv7
+${TRIGGER_X86} x86: cross-x86
+${TRIGGER_X64} x64: cross-x64
 
 #
 # Create cross compiling environment by
