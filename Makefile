@@ -2,12 +2,12 @@ ORG = jam7
 NPROCS = `nproc`
 
 PACKAGES = linux-headers binutils gcc glibc
-PACKAGES_ARMV7 = $(PACKAGES:%=packages/%.armv7.sh)
-PACKAGES_X86 = $(PACKAGES:%=packages/%.x86.sh)
-PACKAGES_X64 = $(PACKAGES:%=packages/%.x64.sh)
-TRIGGER_ARMV7 = $(PACKAGES:%=packages/%.armv7)
-TRIGGER_X86 = $(PACKAGES:%=packages/%.x86)
-TRIGGER_X64 = $(PACKAGES:%=packages/%.x64)
+PACKAGES_ARMV7 = $(PACKAGES:%=cross-armv7/%.sh)
+PACKAGES_X86 = $(PACKAGES:%=cross-x86/%.sh)
+PACKAGES_X64 = $(PACKAGES:%=cross-x64/%.sh)
+TRIGGER_ARMV7 = $(PACKAGES:%=cross-armv7/%.image)
+TRIGGER_X86 = $(PACKAGES:%=cross-x86/%.image)
+TRIGGER_X64 = $(PACKAGES:%=cross-x64/%.image)
 
 usage:
 	@echo
@@ -20,7 +20,7 @@ usage:
 	@echo "Currently creates "'"'"${PACKAGES}"'"'" only"
 	@echo
 
-.SUFFIXES: .sh.in .armv7.sh .x86.sh .x64.sh .armv7 .x86 .x64
+.SUFFIXES: .sh.in .sh .image
 
 clean:
 	rm -f packages/*.armv7.sh packages/*.x86.sh packages/*.x64.sh
@@ -32,40 +32,43 @@ clean:
 
 all: armv7 x86 x64
 
-.sh.in.armv7.sh:
+cross-armv7/%.sh: packages/%.sh.in
 	cpp -DCHROMEBREW_ARMV7 -Ulinux -P -E $< | sed -e 's:ENV \([^ ]*\) :\1=:' > $@
 
-.sh.in.x86.sh:
+cross-x86/%.sh: packages/%.sh.in
 	cpp -DCHROMEBREW_X86 -Ulinux -P -E $< | sed -e 's:ENV \([^ ]*\) :\1=:' > $@
 
-.sh.in.x64.sh:
+cross-x64/%.sh: packages/%.sh.in
 	cpp -DCHROMEBREW_X64 -Ulinux -P -E $< | sed -e 's:ENV \([^ ]*\) :\1=:' > $@
 
 ${PACKAGES_ARMV7} ${PACKAGES_X86} ${PACKAGES_X64}: env.docker
 
-.armv7.sh.armv7:
-	docker run -it --rm -v $(PWD):/work -v $(PWD)/dist:/dist \
+cross-armv7/%.image: cross-armv7/%.sh
+	docker run -it --rm -v $(PWD)/cross-armv7:/work/cross-armv7 -v $(PWD)/dist:/dist \
 		-e http_proxy=${http_proxy} \
 		-e https_proxy=${https_proxy} \
 		-e ftp_proxy=${ftp_proxy} \
 		-e NPROCS=${NPROCS} \
 		$(ORG)/cross-armv7 /bin/bash /work/$<
+	touch $@
 
-.x86.sh.x86:
-	docker run -it --rm -v $(PWD):/work -v $(PWD)/dist:/dist \
+cross-x86/%.image: cross-x86/%.sh
+	docker run -it --rm -v $(PWD)/cross-x86:/work/cross-x86 -v $(PWD)/dist:/dist \
 		-e http_proxy=${http_proxy} \
 		-e https_proxy=${https_proxy} \
 		-e ftp_proxy=${ftp_proxy} \
 		-e NPROCS=${NPROCS} \
 		$(ORG)/cross-x86 /bin/bash /work/$<
+	touch $@
 
-.x64.sh.x64:
-	docker run -it --rm -v $(PWD):/work -v $(PWD)/dist:/dist \
+cross-x64/%.image: cross-x64/%.sh
+	docker run -it --rm -v $(PWD)/cross-x64:/work/cross-x64 -v $(PWD)/dist:/dist \
 		-e http_proxy=${http_proxy} \
 		-e https_proxy=${https_proxy} \
 		-e ftp_proxy=${ftp_proxy} \
 		-e NPROCS=${NPROCS} \
 		$(ORG)/cross-x64 /bin/bash /work/$<
+	touch $@
 
 armv7: $(PACKAGES_ARMV7) $(TRIGGER_ARMV7)
 
