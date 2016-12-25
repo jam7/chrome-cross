@@ -43,11 +43,11 @@ Details
 
 All binary and shared libraries are compiled with appropriate -rpath options.
 
-|chipset|rpaths|
-|---|---|
-|armv7l|/usr/local/lib|
-|x86|/usr/local/lib:/usr/local/lib32|
-|x64|/usr/local/lib:/usr/local/lib64|
+|chipset|uname -m|rpaths|
+|:---:|:---:|---|
+|armv7l|armv7l|/usr/local/lib|
+|x86|i686|/usr/local/lib|
+|x64|x86\_64|/usr/local/lib:/usr/local/lib64|
 
 License
 -------
