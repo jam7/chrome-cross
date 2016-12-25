@@ -52,6 +52,13 @@ RUN cd /src/${GCC_VERSION} \
         && ln -s ../${MPFR_VERSION} mpfr \
         && ln -s ../${MPC_VERSION} mpc
 
+// fix undefined '__stack_chk_guard' problem on x86 and x64.
+// see http://www.linuxquestions.org/questions/linux-from-scratch-13/install-glibc-2-17-error-help-me-4175460557/ and
+// http://stackoverflow.com/questions/15787684/lfs-glibc-compilation-ld-error for mode details
+
+RUN cd /src/${GCC_VERSION} \
+        && sed -i '/k prot/agcc_cv_libc_provides_ssp=yes' gcc/configure
+
 // cross
 
 ENV PATH ${CROS_HOST_PREFIX}/bin:$PATH
@@ -104,6 +111,5 @@ WORKDIR /build/gcc
 RUN make -j ${CROS_CORES} all && make install
 
 WORKDIR /
-RUN rm -rf /src
 RUN rm -rf /build
 
