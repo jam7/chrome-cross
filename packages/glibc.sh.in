@@ -7,31 +7,25 @@
 cd /${CROS_HOST_DEST}
 wget -q -O - "https://raw.github.com/skycocker/chromebrew/master/create_package.sh" | sed -e 's:czf:cJf:' -e 's:.gz:.xz:g' > create_package.sh
 
-// prepare sources
-
-mkdir /src
-cd /src
-wget -q "ftp://ftp.gnu.org/gnu/glibc/${GLIBC_VERSION}.tar.gz"
-for f in *.tar*; do tar xfk $f; done
-
 // glibc
 
 pkgname=${GLIBC_VERSION}-chromeos-${CROS_PKG_ARCH}
-mkdir -p /build/glibc
-cd /build/glibc
-/src/${GLIBC_VERSION}/configure \
+mkdir -p /build/glibc \
+    && cd /build/glibc \
+    && LDFLAGS="-Wl,-rpath,${CROS_TARGET_LIB}" /src/${GLIBC_VERSION}/configure \
         --prefix=${CROS_TARGET_PREFIX} \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
         --target=${CROS_TARGET} \
-        ${CROS_NATIVE_GCC_OPT} \
+        ${CROS_NATIVE_LIBC_OPT} \
         --disable-sanity-checks \
-        && make -j ${CROS_CORES} \
-        && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install
+    && make -j ${CROS_CORES} \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install
+[ "$?" != "0" ] && exit 1
 
 // adjust libraries alived already in system
 
-cd /${CROS_HOST_DEST}/${pkgname}
+cd ${CROS_HOST_DEST}/${pkgname}
 
 #ifdef CHROMEBREW_ARMV7
 rm usr/local/lib/ld-linux-armhf.so.3
@@ -42,6 +36,11 @@ LIB=lib
 #define NO_MEMUSAGE                     // no libmemusage in system, so leave it as is
 #define NO_PCPROFILE                    // no libpcprofile in system, so leave it as is
 #define NO_SEGFAULT                     // no libSegFault in system, so leave it as is
+#define NO_NSSCOMPAT                    // no libnss_compat in system, so leave it as is
+#define NO_NSSDB                        // no libnss_db in system, so leave it as is
+#define NO_NSSHESIOD                    // no libnss_hesiod in system, so leave it as is
+#define NO_NSSNISPLUS                   // no libnss_nisplus in system, so leave it as is
+#define NO_NSSNIS                       // no libnss_nis in system, so leave it as is
 #endif
 #ifdef CHROMEBREW_X86
 rm usr/local/lib/ld-linux.so.2
@@ -78,20 +77,30 @@ rm usr/local/lib/libm.so.6
 ln -s /${LIB}/libm.so.6 usr/local/lib/libm.so.6
 rm usr/local/lib/libnsl.so.1
 ln -s /${LIB}/libnsl.so.1 usr/local/lib/libnsl.so.1
+#ifndef NO_NSSCOMPAT
 rm usr/local/lib/libnss_compat.so.2
 ln -s /${LIB}/libnss_compat.so.2 usr/local/lib/libnss_compat.so.2
+#endif
+#ifndef NO_NSSDB
 rm usr/local/lib/libnss_db.so.2
 ln -s /${LIB}/libnss_db.so.2 usr/local/lib/libnss_db.so.2
+#endif
 rm usr/local/lib/libnss_dns.so.2
 ln -s /${LIB}/libnss_dns.so.2 usr/local/lib/libnss_dns.so.2
 rm usr/local/lib/libnss_files.so.2
 ln -s /${LIB}/libnss_files.so.2 usr/local/lib/libnss_files.so.2
+#ifndef NO_NSSHESIOD
 rm usr/local/lib/libnss_hesiod.so.2
 ln -s /${LIB}/libnss_hesiod.so.2 usr/local/lib/libnss_hesiod.so.2
+#endif
+#ifndef NO_NSSNISPLUS
 rm usr/local/lib/libnss_nisplus.so.2
 ln -s /${LIB}/libnss_nisplus.so.2 usr/local/lib/libnss_nisplus.so.2
+#endif
+#ifndef NO_NSSNIS
 rm usr/local/lib/libnss_nis.so.2
 ln -s /${LIB}/libnss_nis.so.2 usr/local/lib/libnss_nis.so.2
+#endif
 #ifndef NO_PCPROFILE
 rm usr/local/lib/libpcprofile.so
 ln -s /${LIB}/libpcprofile.so usr/local/lib/libpcprofile.so
@@ -112,4 +121,7 @@ rm usr/local/lib/libthread_db.so.1
 ln -s /${LIB}/libthread_db.so.1 usr/local/lib/libthread_db.so.1
 rm usr/local/lib/libutil.so.1
 ln -s /${LIB}/libutil.so.1 usr/local/lib/libutil.so.1
-cd /${CROS_HOST_DEST}/${pkgname}; sh ../create_package.sh; rm -rf /${CROS_HOST_DEST}/${pkgname}
+
+cd ${CROS_HOST_DEST}/${pkgname} \
+    && sh ../create_package.sh \
+    && rm -rf ${CROS_HOST_DEST}/${pkgname}

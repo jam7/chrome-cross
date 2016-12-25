@@ -7,84 +7,90 @@
 cd /${CROS_HOST_DEST}
 wget -q -O - "https://raw.github.com/skycocker/chromebrew/master/create_package.sh" | sed -e 's:czf:cJf:' -e 's:.gz:.xz:g' > create_package.sh
 
-// prepare sources
-
-mkdir /src
-cd /src
-wget -q "ftp://ftp.gnu.org/gnu/gmp/${GMP_VERSION}.tar.bz2"
-wget -q "ftp://ftp.gnu.org/gnu/mpfr/${MPFR_VERSION}.tar.gz"
-wget -q "ftp://ftp.gnu.org/gnu/mpc/${MPC_VERSION}.tar.gz"
-for f in *.tar*; do tar xfk $f; done
-
 // gmp
 
 pkgname=${GMP_VERSION}-chromeos-${CROS_PKG_ARCH}
-mkdir -p /build/gmp
-cd /build/gmp
-/src/${GMP_VERSION}/configure \
+mkdir -p /build/gmp \
+    && cd /build/gmp \
+    && LDFLAGS=${CROS_NATIVE_LDFLAGS} /src/${GMP_VERSION}/configure \
         --prefix=${CROS_TARGET_PREFIX} \
+        --libdir=${CROS_TARGET_LIB} \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
         --enable-cxx \
-        --with-sysroot=${CROS_HOST_PREFIX} \
-        && make -j ${CROS_CORES} \
-        && make DESTDIR=${CROS_HOST_PREFIX} install \
-        && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install
-cd /${CROS_HOST_DEST}/${pkgname}; sh ../create_package.sh; rm -rf /${CROS_HOST_DEST}/${pkgname}
+        --with-sysroot=${CROS_HOST_PREFIX}/${CROS_TARGET} \
+    && make -j ${CROS_CORES} \
+    && make DESTDIR=${CROS_HOST_PREFIX}/${CROS_TARGET} install \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && cd ${CROS_HOST_DEST}/${pkgname} \
+    && sh ../create_package.sh \
+    && rm -rf ${CROS_HOST_DEST}/${pkgname}
+[ "$?" != "0" ] && exit 1
 
 // mpfr
 
 pkgname=${MPFR_VERSION}-chromeos-${CROS_PKG_ARCH}
-mkdir -p /build/mpfr
-cd /build/mpfr
-/src/${MPFR_VERSION}/configure \
+mkdir -p /build/mpfr \
+    && cd /build/mpfr \
+    && LDFLAGS=${CROS_NATIVE_LDFLAGS} /src/${MPFR_VERSION}/configure \
         --prefix=${CROS_TARGET_PREFIX} \
+        --libdir=${CROS_TARGET_LIB} \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
-        --with-sysroot=${CROS_HOST_PREFIX} \
-        --with-gmp=${CROS_HOST_PREFIX}/${CROS_TARGET_PREFIX} \
-        && make -j ${CROS_CORES} \
-        && make DESTDIR=${CROS_HOST_PREFIX} install \
-        && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install
-cd /${CROS_HOST_DEST}/${pkgname}; sh ../create_package.sh; rm -rf /${CROS_HOST_DEST}/${pkgname}
+        --with-sysroot=${CROS_HOST_PREFIX}/${CROS_TARGET} \
+        --with-gmp-include=${CROS_HOST_PREFIX}/${CROS_TARGET}/${CROS_TARGET_PREFIX}/include \
+        --with-gmp-lib=${CROS_HOST_PREFIX}/${CROS_TARGET}/${CROS_TARGET_LIB} \
+    && make -j ${CROS_CORES} \
+    && make DESTDIR=${CROS_HOST_PREFIX}/${CROS_TARGET} install \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && cd ${CROS_HOST_DEST}/${pkgname} \
+    && sh ../create_package.sh \
+    && rm -rf ${CROS_HOST_DEST}/${pkgname}
+[ "$?" != "0" ] && exit 1
 
 // mpc
 
 pkgname=${MPC_VERSION}-chromeos-${CROS_PKG_ARCH}
-mkdir -p /build/mpc
-cd /build/mpc
-/src/${MPC_VERSION}/configure \
+mkdir -p /build/mpc \
+    && cd /build/mpc \
+    && LDFLAGS=${CROS_NATIVE_LDFLAGS} /src/${MPC_VERSION}/configure \
         --prefix=${CROS_TARGET_PREFIX} \
+        --libdir=${CROS_TARGET_LIB} \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
-        --with-sysroot=${CROS_HOST_PREFIX} \
-        --with-gmp=${CROS_HOST_PREFIX}/${CROS_TARGET_PREFIX} \
-        --with-mpfr=${CROS_HOST_PREFIX}/${CROS_TARGET_PREFIX} \
-        && make -j ${CROS_CORES} \
-        && make DESTDIR=${CROS_HOST_PREFIX} install \
-        && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install
-cd /${CROS_HOST_DEST}/${pkgname}; sh ../create_package.sh; rm -rf /${CROS_HOST_DEST}/${pkgname}
+        --with-sysroot=${CROS_HOST_PREFIX}/${CROS_TARGET} \
+        --with-gmp-include=${CROS_HOST_PREFIX}/${CROS_TARGET}/${CROS_TARGET_PREFIX}/include \
+        --with-gmp-lib=${CROS_HOST_PREFIX}/${CROS_TARGET}/${CROS_TARGET_LIB} \
+        --with-mpfr-include=${CROS_HOST_PREFIX}/${CROS_TARGET}/${CROS_TARGET_PREFIX}/include \
+        --with-mpfr-lib=${CROS_HOST_PREFIX}/${CROS_TARGET}/${CROS_TARGET_LIB} \
+    && make -j ${CROS_CORES} \
+    && make DESTDIR=${CROS_HOST_PREFIX}/${CROS_TARGET} install \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && cd ${CROS_HOST_DEST}/${pkgname} \
+    && sh ../create_package.sh \
+    && rm -rf ${CROS_HOST_DEST}/${pkgname}
+[ "$?" != "0" ] && exit 1
 
 // gcc
 
-//        --with-sysroot=${CROS_HOST_PREFIX} \
-
-cd /src
-git clone -b ${CHROMIUM_VERSION} --depth 1 "https://chromium.googlesource.com/chromiumos/third_party/gcc" ${GCC_VERSION}
-
 pkgname=${GCC_VERSION}-chromeos-${CROS_PKG_ARCH}
-mkdir -p /build/gcc
-cd /build/gcc
-/src/${GCC_VERSION}/configure \
+mkdir -p /build/gcc \
+    && cd /build/gcc \
+    && LDFLAGS=${CROS_NATIVE_LDFLAGS} /src/${GCC_VERSION}/configure \
         --prefix=${CROS_TARGET_PREFIX} \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
         --target=${CROS_TARGET} \
         --enable-languages=c,c++ \
-        --with-gmp=${CROS_HOST_PREFIX}/${CROS_TARGET_PREFIX} \
-        --with-mpfr=${CROS_HOST_PREFIX}/${CROS_TARGET_PREFIX} \
-        --with-mpc=${CROS_HOST_PREFIX}/${CROS_TARGET_PREFIX} \
+        --with-gmp-include=${CROS_HOST_PREFIX}/${CROS_TARGET}/${CROS_TARGET_PREFIX}/include \
+        --with-gmp-lib=${CROS_HOST_PREFIX}/${CROS_TARGET}/${CROS_TARGET_LIB} \
+        --with-mpfr-include=${CROS_HOST_PREFIX}/${CROS_TARGET}/${CROS_TARGET_PREFIX}/include \
+        --with-mpfr-lib=${CROS_HOST_PREFIX}/${CROS_TARGET}/${CROS_TARGET_LIB} \
+        --with-mpc-include=${CROS_HOST_PREFIX}/${CROS_TARGET}/${CROS_TARGET_PREFIX}/include \
+        --with-mpc-lib=${CROS_HOST_PREFIX}/${CROS_TARGET}/${CROS_TARGET_LIB} \
         ${CROS_NATIVE_GCC_OPT} \
-        && make -j ${CROS_CORES} \
-        && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install
-cd /${CROS_HOST_DEST}/${pkgname}; sh ../create_package.sh; rm -rf /${CROS_HOST_DEST}/${pkgname}
+    && make -j ${CROS_CORES} \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && cd ${CROS_HOST_DEST}/${pkgname} \
+    && sh ../create_package.sh \
+    && rm -rf ${CROS_HOST_DEST}/${pkgname}

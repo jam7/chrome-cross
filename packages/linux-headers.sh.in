@@ -7,16 +7,12 @@
 cd /${CROS_HOST_DEST}
 wget -q -O - "https://raw.github.com/skycocker/chromebrew/master/create_package.sh" | sed -e 's:czf:cJf:' -e 's:.gz:.xz:g' > create_package.sh
 
-// prepare sources
-
-mkdir /src
-cd /src
-wget -q "ftp://www.kernel.org/pub/linux/kernel/v3.x/${LINUX_VERSION}.tar.xz"
-for f in *.tar*; do tar xfk $f; done
-
 // linux-headers
 
 pkgname=linux-headers-$(echo ${LINUX_VERSION} | sed -e s:linux-::)-chromeos-${CROS_PKG_ARCH}
-cd /src/${LINUX_VERSION}
-make mrproper && make ARCH=${CROS_KERNEL_ARCH} INSTALL_HDR_PATH=${CROS_HOST_DEST}/${pkgname}/${CROS_TARGET_PREFIX} headers_install
-cd /${CROS_HOST_DEST}/${pkgname}; sh ../create_package.sh; rm -rf /${CROS_HOST_DEST}/${pkgname}
+cd /src/${LINUX_VERSION} \
+    && make mrproper \
+    && make ARCH=${CROS_KERNEL_ARCH} INSTALL_HDR_PATH=${CROS_HOST_DEST}/${pkgname}/${CROS_TARGET_PREFIX} headers_install \
+    && cd ${CROS_HOST_DEST}/${pkgname} \
+    && sh ../create_package.sh \
+    && rm -rf ${CROS_HOST_DEST}/${pkgname}

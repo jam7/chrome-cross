@@ -31,6 +31,17 @@ I would like to compile other packages also with this, but it is difficult to do
 
 I may enhance this system or use dockcross for such purpose, but it's not finished yet.
 
+Details
+-------
+
+All binary and shared libraries are compiled with appropriate -rpath options.
+
+|chipset|rpaths|
+|---|---|
+|armv7l|/usr/local/lib|
+|x86|/usr/local/lib:/usr/local/lib32|
+|x64|/usr/local/lib:/usr/local/lib64|
+
 License
 -------
 
