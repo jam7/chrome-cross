@@ -2,10 +2,15 @@
 
 #include "../env.docker"
 
-// prepare create_package script
+// prepare library sources
 
-cd /${CROS_HOST_DEST}
-wget -q -O - "https://raw.github.com/skycocker/chromebrew/master/create_package.sh" | sed -e 's:czf:cJf:' -e 's:.gz:.xz:g' > create_package.sh
+cd /src \
+    && wget -q "ftp://ftp.gnu.org/gnu/gmp/${GMP_VERSION}.tar.bz2" \
+    && wget -q "ftp://ftp.gnu.org/gnu/mpfr/${MPFR_VERSION}.tar.gz" \
+    && wget -q "ftp://ftp.gnu.org/gnu/mpc/${MPC_VERSION}.tar.gz" \
+    && for f in *.tar*; do tar xfk $f; done \
+    && rm -rf *.tar*
+[ "$?" != "0" ] && exit 1
 
 // gmp
 
@@ -69,6 +74,21 @@ mkdir -p /build/mpc \
     && cd ${CROS_HOST_DEST}/${pkgname} \
     && sh ../create_package.sh \
     && rm -rf ${CROS_HOST_DEST}/${pkgname}
+[ "$?" != "0" ] && exit 1
+
+// prepare gcc sources
+
+// Following sed command at *1* is to fix undefined '__stack_chk_guard' problem on x86 and x64.
+// see http://www.linuxquestions.org/questions/linux-from-scratch-13/install-glibc-2-17-error-help-me-4175460557/ and
+// http://stackoverflow.com/questions/15787684/lfs-glibc-compilation-ld-error for mode details
+
+cd /src \
+    && git clone -b ${CHROMIUM_VERSION} --depth 1 "https://chromium.googlesource.com/chromiumos/third_party/gcc" ${GCC_VERSION} \
+    && ${GCC_VERSION} \
+    && ln -s ../${GMP_VERSION} gmp \
+    && ln -s ../${MPFR_VERSION} mpfr \
+    && ln -s ../${MPC_VERSION} mpc \
+    && sed -i '/k prot/agcc_cv_libc_provides_ssp=yes' gcc/configure /*1*/ \
 [ "$?" != "0" ] && exit 1
 
 // gcc

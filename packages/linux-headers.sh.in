@@ -2,12 +2,13 @@
 
 #include "../env.docker"
 
-// prepare create_package script
-
-cd /${CROS_HOST_DEST}
-wget -q -O - "https://raw.github.com/skycocker/chromebrew/master/create_package.sh" | sed -e 's:czf:cJf:' -e 's:.gz:.xz:g' > create_package.sh
-
 // linux-headers
+
+cd /src \
+    && wget -q "ftp://www.kernel.org/pub/linux/kernel/v3.x/${LINUX_VERSION}.tar.xz" \
+    && tar xfk ${LINUX_VERSION}.tar.xz \
+    && rm ${LINUX_VERSION}.tar.xz
+[ "$?" != "0" ] && exit 1
 
 pkgname=linux-headers-$(echo ${LINUX_VERSION} | sed -e s:linux-::)-chromeos-${CROS_PKG_ARCH}
 cd /src/${LINUX_VERSION} \
