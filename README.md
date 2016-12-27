@@ -17,11 +17,7 @@ You will need a 64 bits linux box with docker implemented.
 Usage
 -----
 
-First, need to prepare cross compiling environment on docker by following commands.
-
-    make cross-armv7 | cross-x86 | cross-x64 | cross
-
-Then, make packages using above cross compiler by following commands.
+Make packages using cross compiler by following commands.  This may download docker images for cross comppiler.
 
     make armv7 | x86 | x64 | all
 
@@ -60,15 +56,15 @@ Made following packages for armv7, x86 and x64.
 
     linuxheaders, binutils, glibc, gmp, mpfr, mpc and gcc
 
-Other usage
------------
+Other packages
+--------------
 
-I would like to compile other packages also with this, but it is difficult to do so since it requires Chromeos environment.  For example, a package may require /usr/lib/libcrypt.so, but this cross compiling environment has only /usr/local/lib stuff.  Chromeos environment contains such /usr/lib stuff.
+I would like to compile other packages also using this environemt, but it is difficult to do so since it requires Chromeos environment.  For example, a package may require /usr/lib/libcrypt.so, but this cross compiling environment has only /usr/local/lib stuff.  Chromeos environment contains such /usr/lib stuff.
 
 I may enhance this system or use dockcross for such purpose, but it's not finished yet.
 
-Details
--------
+RPATH configuration
+-------------------
 
 All binary and shared libraries are compiled with appropriate -rpath options like below.
 
@@ -77,6 +73,15 @@ All binary and shared libraries are compiled with appropriate -rpath options lik
 |armv7l|armv7l|/usr/local/lib|
 |x86|i686|/usr/local/lib|
 |x64|x86\_64|/usr/local/lib:/usr/local/lib64|
+
+I'm not sure what I should do for /usr/local/lib32, so I'm currently not using it.
+
+Cross Compiler
+--------------
+
+If you would like to create cross compiler by your self, use following commands.
+
+    make cross-armv7 | cross-x86 | cross-x64 | cross
 
 License
 -------
