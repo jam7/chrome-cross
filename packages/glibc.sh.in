@@ -11,6 +11,21 @@ cd /src \
 [ "$?" != "0" ] && exit 1
 
 pkgname=${GLIBC_VERSION}-chromeos-${CROS_PKG_ARCH}
+
+// specify library directory
+
+#ifdef CHROMEBREW_ARMV7
+#define USE_LIB
+#endif
+#ifdef CHROMEBREW_X86
+#define USE_LIB
+#endif
+#ifdef CHROMEBREW_X64
+#define USE_LIB64
+#endif
+
+#ifdef USE_LIB
+LIB=lib
 mkdir -p /build/glibc \
     && cd /build/glibc \
     && LDFLAGS="-Wl,-rpath,${CROS_TARGET_LIB}" /src/${GLIBC_VERSION}/configure \
@@ -22,6 +37,25 @@ mkdir -p /build/glibc \
         --disable-sanity-checks \
     && make -j ${CROS_CORES} \
     && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install
+#endif
+#ifdef USE_LIB64
+LIB=lib64
+// need special treatment to place library files in lib64
+mkdir -p /build/glibc \
+    && cd /build/glibc \
+    && echo "slibdir=${CROS_TARGET_PREFIX}/lib64" > configparms \
+    && LDFLAGS="-Wl,-rpath,${CROS_TARGET_LIB}" /src/${GLIBC_VERSION}/configure \
+        --prefix=${CROS_TARGET_PREFIX} \
+        --libdir=${CROS_TARGET_PREFIX}/lib64 \
+        --build=${CROS_HOST} \
+        --host=${CROS_TARGET} \
+        --target=${CROS_TARGET} \
+        ${CROS_NATIVE_LIBC_OPT} \
+        --disable-sanity-checks \
+    && make -j ${CROS_CORES} \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install
+#endif
+
 [ "$?" != "0" ] && exit 1
 
 // adjust libraries alived already in system
@@ -29,99 +63,84 @@ mkdir -p /build/glibc \
 cd ${CROS_HOST_DEST}/${pkgname}
 
 #ifdef CHROMEBREW_ARMV7
-rm usr/local/lib/ld-linux-armhf.so.3
-ln -s /lib/ld-linux-armhf.so.3 usr/local/lib/ld-linux-armhf.so.3
+rm usr/local/${LIB}/ld-linux-armhf.so.3
+ln -s /${LIB}/ld-linux-armhf.so.3 usr/local/${LIB}/ld-linux-armhf.so.3
+#endif
+#ifdef CHROMEBREW_X86
+rm usr/local/${LIB}/ld-linux.so.2
+ln -s /${LIB}/ld-linux.so.2 usr/local/${LIB}/ld-linux.so.2
+#endif
+#ifdef CHROMEBREW_X64
+rm usr/local/${LIB}/ld-linux-x86-64.so.2
+ln -s /${LIB}/ld-linux-x86-64.so.2 usr/local/${LIB}/ld-linux-x86-64.so.2
+#endif
 
-LIB=lib
+// libc.so and libpthread.so are ld script, so need to maintain symbolic links
+rm usr/local/${LIB}/libc-*
+rm usr/local/${LIB}/libc.a
+rm usr/local/${LIB}/libc.so.6
+ln -s /${LIB}/libc.so.6  usr/local/${LIB}/libc.so.6
+rm usr/local/${LIB}/libpthread-*.so
+rm usr/local/${LIB}/libpthread.a
+rm usr/local/${LIB}/libpthread.so.0
+ln -s /${LIB}/libpthread.so.0 usr/local/${LIB}/libpthread.so.0
+
+// Remove other libraries already existed in system
+
+// libraries not existed in system although those might be existed previously
 #define NO_BROKENLOCALE                 // no libBrokenLocale in system, so leave it as is
 #define NO_MEMUSAGE                     // no libmemusage in system, so leave it as is
 #define NO_PCPROFILE                    // no libpcprofile in system, so leave it as is
 #define NO_SEGFAULT                     // no libSegFault in system, so leave it as is
+
+// remove all libnss* even if some of them are not in system
+#if 0
 #define NO_NSSCOMPAT                    // no libnss_compat in system, so leave it as is
 #define NO_NSSDB                        // no libnss_db in system, so leave it as is
 #define NO_NSSHESIOD                    // no libnss_hesiod in system, so leave it as is
 #define NO_NSSNISPLUS                   // no libnss_nisplus in system, so leave it as is
 #define NO_NSSNIS                       // no libnss_nis in system, so leave it as is
 #endif
-#ifdef CHROMEBREW_X86
-rm usr/local/lib/ld-linux.so.2
-ln -s /lib/ld-linux.so.2 usr/local/lib/ld-linux.so.2
 
-LIB=lib
-#endif
-#ifdef CHROMEBREW_X64
-rm usr/local/lib/ld-linux-x86-64.so.2
-ln -s /lib64/ld-linux-x86-64.so.2 usr/local/lib/ld-linux-x86-64.so.2
-
-LIB=lib64
-#endif
-
-rm usr/local/lib/libanl.so.1
-ln -s /${LIB}/libanl.so.1 usr/local/lib/libanl.so.1
+rm usr/local/${LIB}/libanl[.-]*
 #ifndef NO_BROKENLOCALE
-rm usr/local/lib/libBrokenLocale.so.1
-ln -s /${LIB}/libBrokenLocale.so.1 usr/local/lib/libBrokenLocale.so.1
+rm usr/local/${LIB}/libBrokenLocale[.-]*
 #endif
-rm usr/local/lib/libcidn.so.1
-ln -s /${LIB}/libcidn.so.1 usr/local/lib/libcidn.so.1
-rm usr/local/lib/libcrypt.so.1
-ln -s /${LIB}/libcrypt.so.1 usr/local/lib/libcrypt.so.1
-rm usr/local/lib/libc.so.6
-ln -s /${LIB}/libc.so.6 usr/local/lib/libc.so.6
-rm usr/local/lib/libdl.so.2
-ln -s /${LIB}/libdl.so.2 usr/local/lib/libdl.so.2
+rm usr/local/${LIB}/libcidn[.-]*
+rm usr/local/${LIB}/libcrypt[.-]*
+rm usr/local/${LIB}/libdl[.-]*
 #ifndef NO_MEMUSAGE
-rm usr/local/lib/libmemusage.so
-ln -s /${LIB}/libmemusage.so usr/local/lib/libmemusage.so
+rm usr/local/${LIB}/libmemusage[.-]*
 #endif
-rm usr/local/lib/libm.so.6
-ln -s /${LIB}/libm.so.6 usr/local/lib/libm.so.6
-rm usr/local/lib/libnsl.so.1
-ln -s /${LIB}/libnsl.so.1 usr/local/lib/libnsl.so.1
+rm usr/local/${LIB}/libm[.-]*
+rm usr/local/${LIB}/libnsl[.-]*
 #ifndef NO_NSSCOMPAT
-rm usr/local/lib/libnss_compat.so.2
-ln -s /${LIB}/libnss_compat.so.2 usr/local/lib/libnss_compat.so.2
+rm usr/local/${LIB}/libnss_compat[.-]*
 #endif
 #ifndef NO_NSSDB
-rm usr/local/lib/libnss_db.so.2
-ln -s /${LIB}/libnss_db.so.2 usr/local/lib/libnss_db.so.2
+rm usr/local/${LIB}/libnss_db[.-]*
 #endif
-rm usr/local/lib/libnss_dns.so.2
-ln -s /${LIB}/libnss_dns.so.2 usr/local/lib/libnss_dns.so.2
-rm usr/local/lib/libnss_files.so.2
-ln -s /${LIB}/libnss_files.so.2 usr/local/lib/libnss_files.so.2
+rm usr/local/${LIB}/libnss_dns[.-]*
+rm usr/local/${LIB}/libnss_files[.-]*
 #ifndef NO_NSSHESIOD
-rm usr/local/lib/libnss_hesiod.so.2
-ln -s /${LIB}/libnss_hesiod.so.2 usr/local/lib/libnss_hesiod.so.2
+rm usr/local/${LIB}/libnss_hesiod[.-]*
 #endif
 #ifndef NO_NSSNISPLUS
-rm usr/local/lib/libnss_nisplus.so.2
-ln -s /${LIB}/libnss_nisplus.so.2 usr/local/lib/libnss_nisplus.so.2
+rm usr/local/${LIB}/libnss_nisplus[.-]*
 #endif
 #ifndef NO_NSSNIS
-rm usr/local/lib/libnss_nis.so.2
-ln -s /${LIB}/libnss_nis.so.2 usr/local/lib/libnss_nis.so.2
+rm usr/local/${LIB}/libnss_nis[.-]*
 #endif
 #ifndef NO_PCPROFILE
-rm usr/local/lib/libpcprofile.so
-ln -s /${LIB}/libpcprofile.so usr/local/lib/libpcprofile.so
+rm usr/local/${LIB}/libpcprofile[.-]*
 #endif
-rm usr/local/lib/libpthread.so.0
-ln -s /${LIB}/libpthread.so.0 usr/local/lib/libpthread.so.0
-rm usr/local/lib/libresolv.so.2
-ln -s /${LIB}/libresolv.so.2 usr/local/lib/libresolv.so.2
-rm usr/local/lib/librt.so.1
-ln -s /${LIB}/librt.so.1 usr/local/lib/librt.so.1
+rm usr/local/${LIB}/libresolv[.-]*
+rm usr/local/${LIB}/librt[.-]*
 #ifndef NO_SEGFAULT
-rm usr/local/lib/libSegFault.so
-ln -s /${LIB}/libSegFault.so usr/local/lib/libSegFault.so
+rm usr/local/${LIB}/libSegFault[.-]*
 #endif
-rm usr/local/lib/libthread_db-1.0.so
-ln -s /${LIB}/libthread_db-1.0.so usr/local/lib/libthread_db-1.0.so
-rm usr/local/lib/libthread_db.so.1
-ln -s /${LIB}/libthread_db.so.1 usr/local/lib/libthread_db.so.1
-rm usr/local/lib/libutil.so.1
-ln -s /${LIB}/libutil.so.1 usr/local/lib/libutil.so.1
+rm usr/local/${LIB}/libthread_db[.-]*
+rm usr/local/${LIB}/libutil[.-]*
 
 cd ${CROS_HOST_DEST}/${pkgname} \
     && sh ../create_package.sh \
