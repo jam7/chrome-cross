@@ -25,6 +25,7 @@ pkgname=${GLIBC_VERSION}-chromeos-${CROS_PKG_ARCH}
 #endif
 
 #ifdef USE_LIB
+LOCALLIB=lib
 LIB=lib
 mkdir -p /build/glibc \
     && cd /build/glibc \
@@ -39,6 +40,7 @@ mkdir -p /build/glibc \
     && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install
 #endif
 #ifdef USE_LIB64
+LOCALLIB=lib64
 LIB=lib64
 // need special treatment to place library files in lib64
 mkdir -p /build/glibc \
@@ -63,27 +65,27 @@ mkdir -p /build/glibc \
 cd ${CROS_HOST_DEST}/${pkgname}
 
 #ifdef CHROMEBREW_ARMV7
-rm usr/local/${LIB}/ld-linux-armhf.so.3
-ln -s /${LIB}/ld-linux-armhf.so.3 usr/local/${LIB}/ld-linux-armhf.so.3
+rm usr/local/${LOCALLIB}/ld-linux-armhf.so.3
+ln -s /${LIB}/ld-linux-armhf.so.3 usr/local/${LOCALLIB}/ld-linux-armhf.so.3
 #endif
 #ifdef CHROMEBREW_X86
-rm usr/local/${LIB}/ld-linux.so.2
-ln -s /${LIB}/ld-linux.so.2 usr/local/${LIB}/ld-linux.so.2
+rm usr/local/${LOCALLIB}/ld-linux.so.2
+ln -s /${LIB}/ld-linux.so.2 usr/local/${LOCALLIB}/ld-linux.so.2
 #endif
 #ifdef CHROMEBREW_X64
-rm usr/local/${LIB}/ld-linux-x86-64.so.2
-ln -s /${LIB}/ld-linux-x86-64.so.2 usr/local/${LIB}/ld-linux-x86-64.so.2
+rm usr/local/${LOCALLIB}/ld-linux-x86-64.so.2
+ln -s /${LIB}/ld-linux-x86-64.so.2 usr/local/${LOCALLIB}/ld-linux-x86-64.so.2
 #endif
 
 // libc.so and libpthread.so are ld script, so need to maintain symbolic links
-rm usr/local/${LIB}/libc-*
-rm usr/local/${LIB}/libc.a
-rm usr/local/${LIB}/libc.so.6
-ln -s /${LIB}/libc.so.6  usr/local/${LIB}/libc.so.6
-rm usr/local/${LIB}/libpthread-*.so
-rm usr/local/${LIB}/libpthread.a
-rm usr/local/${LIB}/libpthread.so.0
-ln -s /${LIB}/libpthread.so.0 usr/local/${LIB}/libpthread.so.0
+rm usr/local/${LOCALLIB}/libc-*
+rm usr/local/${LOCALLIB}/libc.a
+rm usr/local/${LOCALLIB}/libc.so.6
+ln -s /${LIB}/libc.so.6  usr/local/${LOCALLIB}/libc.so.6
+rm usr/local/${LOCALLIB}/libpthread-*.so
+rm usr/local/${LOCALLIB}/libpthread.a
+rm usr/local/${LOCALLIB}/libpthread.so.0
+ln -s /${LIB}/libpthread.so.0 usr/local/${LOCALLIB}/libpthread.so.0
 
 // Remove other libraries already existed in system
 
@@ -102,45 +104,45 @@ ln -s /${LIB}/libpthread.so.0 usr/local/${LIB}/libpthread.so.0
 #define NO_NSSNIS                       // no libnss_nis in system, so leave it as is
 #endif
 
-rm usr/local/${LIB}/libanl[.-]*
+rm usr/local/${LOCALLIB}/libanl[.-]*
 #ifndef NO_BROKENLOCALE
-rm usr/local/${LIB}/libBrokenLocale[.-]*
+rm usr/local/${LOCALLIB}/libBrokenLocale[.-]*
 #endif
-rm usr/local/${LIB}/libcidn[.-]*
-rm usr/local/${LIB}/libcrypt[.-]*
-rm usr/local/${LIB}/libdl[.-]*
+rm usr/local/${LOCALLIB}/libcidn[.-]*
+rm usr/local/${LOCALLIB}/libcrypt[.-]*
+rm usr/local/${LOCALLIB}/libdl[.-]*
 #ifndef NO_MEMUSAGE
-rm usr/local/${LIB}/libmemusage[.-]*
+rm usr/local/${LOCALLIB}/libmemusage[.-]*
 #endif
-rm usr/local/${LIB}/libm[.-]*
-rm usr/local/${LIB}/libnsl[.-]*
+rm usr/local/${LOCALLIB}/libm[.-]*
+rm usr/local/${LOCALLIB}/libnsl[.-]*
 #ifndef NO_NSSCOMPAT
-rm usr/local/${LIB}/libnss_compat[.-]*
+rm usr/local/${LOCALLIB}/libnss_compat[.-]*
 #endif
 #ifndef NO_NSSDB
-rm usr/local/${LIB}/libnss_db[.-]*
+rm usr/local/${LOCALLIB}/libnss_db[.-]*
 #endif
-rm usr/local/${LIB}/libnss_dns[.-]*
-rm usr/local/${LIB}/libnss_files[.-]*
+rm usr/local/${LOCALLIB}/libnss_dns[.-]*
+rm usr/local/${LOCALLIB}/libnss_files[.-]*
 #ifndef NO_NSSHESIOD
-rm usr/local/${LIB}/libnss_hesiod[.-]*
+rm usr/local/${LOCALLIB}/libnss_hesiod[.-]*
 #endif
 #ifndef NO_NSSNISPLUS
-rm usr/local/${LIB}/libnss_nisplus[.-]*
+rm usr/local/${LOCALLIB}/libnss_nisplus[.-]*
 #endif
 #ifndef NO_NSSNIS
-rm usr/local/${LIB}/libnss_nis[.-]*
+rm usr/local/${LOCALLIB}/libnss_nis[.-]*
 #endif
 #ifndef NO_PCPROFILE
-rm usr/local/${LIB}/libpcprofile[.-]*
+rm usr/local/${LOCALLIB}/libpcprofile[.-]*
 #endif
-rm usr/local/${LIB}/libresolv[.-]*
-rm usr/local/${LIB}/librt[.-]*
+rm usr/local/${LOCALLIB}/libresolv[.-]*
+rm usr/local/${LOCALLIB}/librt[.-]*
 #ifndef NO_SEGFAULT
-rm usr/local/${LIB}/libSegFault[.-]*
+rm usr/local/${LOCALLIB}/libSegFault[.-]*
 #endif
-rm usr/local/${LIB}/libthread_db[.-]*
-rm usr/local/${LIB}/libutil[.-]*
+rm usr/local/${LOCALLIB}/libthread_db[.-]*
+rm usr/local/${LOCALLIB}/libutil[.-]*
 
 cd ${CROS_HOST_DEST}/${pkgname} \
     && sh ../create_package.sh \
