@@ -5,7 +5,7 @@
 // binutils
 
 cd /src \
-    && git clone -b ${CHROMIUM_VERSION} --depth 1 "https://chromium.googlesource.com/chromiumos/third_party/binutils" /src/${BINUTILS_VERSION}
+    && git clone -b ${BINUTILS_CHROMIUM_VERSION} --depth 1 "https://chromium.googlesource.com/chromiumos/third_party/binutils" /src/${BINUTILS_VERSION}
 [ "$?" != "0" ] && exit 1
 
 pkgname=${BINUTILS_VERSION}-chromeos-${CROS_PKG_ARCH}

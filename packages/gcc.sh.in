@@ -83,8 +83,8 @@ mkdir -p /build/mpc \
 // http://stackoverflow.com/questions/15787684/lfs-glibc-compilation-ld-error for mode details
 
 cd /src \
-    && git clone -b ${CHROMIUM_VERSION} --depth 1 "https://chromium.googlesource.com/chromiumos/third_party/gcc" ${GCC_VERSION} \
-    && ${GCC_VERSION} \
+    && git clone -b ${GCC_CHROMIUM_VERSION} --depth 1 "https://chromium.googlesource.com/chromiumos/third_party/gcc" /src/${GCC_VERSION} \
+    && cd /src/${GCC_VERSION} \
     && ln -s ../${GMP_VERSION} gmp \
     && ln -s ../${MPFR_VERSION} mpfr \
     && ln -s ../${MPC_VERSION} mpc \
