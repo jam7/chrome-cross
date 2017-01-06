@@ -9,6 +9,18 @@ cd /src \
 [ "$?" != "0" ] && exit 1
 
 pkgname=${BINUTILS_VERSION}-chromeos-${CROS_PKG_ARCH}
+
+#ifdef CHROMEBREW_ARMV7
+#define USE_LIB
+#endif
+#ifdef CHROMEBREW_X86
+#define USE_LIB
+#endif
+#ifdef CHROMEBREW_X64
+#define USE_LIB64
+#endif
+
+#ifdef USE_LIB
 mkdir -p /build/binutils \
     && cd /build/binutils \
     && CFLAGS="-Wno-error=array-bounds" LDFLAGS="${CROS_NATIVE_LDFLAGS}" /src/${BINUTILS_VERSION}/configure \
@@ -22,3 +34,22 @@ mkdir -p /build/binutils \
     && cd ${CROS_HOST_DEST}/${pkgname} \
     && sh ../create_package.sh \
     && rm -rf ${CROS_HOST_DEST}/${pkgname}
+#endif
+#ifdef USE_LIB64
+// Following symbolic link at *1* is a trick to make gcc search /usr/local/lib prior to /usr/lib64.
+
+mkdir -p /build/binutils \
+    && cd /build/binutils \
+    && CFLAGS="-Wno-error=array-bounds" LDFLAGS="${CROS_NATIVE_LDFLAGS}" /src/${BINUTILS_VERSION}/configure \
+        --prefix=${CROS_TARGET_PREFIX} \
+        --build=${CROS_HOST} \
+        --host=${CROS_TARGET} \
+        --target=${CROS_TARGET} \
+        ${CROS_NATIVE_GCC_OPT} \
+    && make -j ${CROS_CORES} \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && ln -s ../lib ${CROS_HOST_DEST}/${pkgname}/${CROS_TARGET_PREFIX}/${CROS_TARGET}/lib64 /*1*/ \
+    && cd ${CROS_HOST_DEST}/${pkgname} \
+    && sh ../create_package.sh \
+    && rm -rf ${CROS_HOST_DEST}/${pkgname}
+#endif
