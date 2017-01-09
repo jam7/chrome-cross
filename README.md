@@ -2,7 +2,7 @@ chrome-cross
 ============
 Toolchain builder for chromebrew
 
-**Support X86, X86-64, ARM chipsets, but tested ARM only**
+**Support X86, X86-64, ARM chipsets, but not tested on X86**
 
 Overview
 --------
@@ -25,28 +25,25 @@ You will get toolchains under dist directory.
 
 ```
 $ ls dist
-binutils-2.25-chromeos-armv7l.tar.xz       gmp-5.1.2-chromeos-i686.tar.xz.sha1
-binutils-2.25-chromeos-armv7l.tar.xz.sha1  gmp-5.1.2-chromeos-x86_64.tar.xz
-binutils-2.25-chromeos-i686.tar.xz         gmp-5.1.2-chromeos-x86_64.tar.xz.sha1
-binutils-2.25-chromeos-i686.tar.xz.sha1    linux-headers-3.14-chromeos-armv7l.tar.xz
-binutils-2.25-chromeos-x86_64.tar.xz       linux-headers-3.14-chromeos-armv7l.tar.xz.sha1
-binutils-2.25-chromeos-x86_64.tar.xz.sha1  linux-headers-3.4-chromeos-i686.tar.xz
-create_package.sh                          linux-headers-3.4-chromeos-i686.tar.xz.sha1
-gcc-4.9.x-chromeos-armv7l.tar.xz           linux-headers-3.8-chromeos-x86_64.tar.xz
-gcc-4.9.x-chromeos-armv7l.tar.xz.sha1      linux-headers-3.8-chromeos-x86_64.tar.xz.sha1
-gcc-4.9.x-chromeos-i686.tar.xz             mpc-1.0.1-chromeos-armv7l.tar.xz
-gcc-4.9.x-chromeos-i686.tar.xz.sha1        mpc-1.0.1-chromeos-armv7l.tar.xz.sha1
-gcc-4.9.x-chromeos-x86_64.tar.xz           mpc-1.0.1-chromeos-i686.tar.xz
-gcc-4.9.x-chromeos-x86_64.tar.xz.sha1      mpc-1.0.1-chromeos-i686.tar.xz.sha1
-glibc-2.17-chromeos-i686.tar.xz            mpc-1.0.1-chromeos-x86_64.tar.xz
-glibc-2.17-chromeos-i686.tar.xz.sha1       mpc-1.0.1-chromeos-x86_64.tar.xz.sha1
-glibc-2.17-chromeos-x86_64.tar.xz          mpfr-3.1.2-chromeos-armv7l.tar.xz
-glibc-2.17-chromeos-x86_64.tar.xz.sha1     mpfr-3.1.2-chromeos-armv7l.tar.xz.sha1
-glibc-2.19-chromeos-armv7l.tar.xz          mpfr-3.1.2-chromeos-i686.tar.xz
-glibc-2.19-chromeos-armv7l.tar.xz.sha1     mpfr-3.1.2-chromeos-i686.tar.xz.sha1
-gmp-5.1.2-chromeos-armv7l.tar.xz           mpfr-3.1.2-chromeos-x86_64.tar.xz
-gmp-5.1.2-chromeos-armv7l.tar.xz.sha1      mpfr-3.1.2-chromeos-x86_64.tar.xz.sha1
-gmp-5.1.2-chromeos-i686.tar.xz
+binutils-2.25-chromeos-armv7l.tar.xz       glibc-2.19-chromeos-armv7l.tar.xz          linux-headers-3.18-chromeos-armv7l.tar.xz.sha1
+binutils-2.25-chromeos-armv7l.tar.xz.sha1  glibc-2.19-chromeos-armv7l.tar.xz.sha1     linux-headers-3.18-chromeos-i686.tar.xz
+binutils-2.25-chromeos-i686.tar.xz         glibc-2.19-chromeos-i686.tar.xz            linux-headers-3.18-chromeos-i686.tar.xz.sha1
+binutils-2.25-chromeos-i686.tar.xz.sha1    glibc-2.19-chromeos-i686.tar.xz.sha1       linux-headers-3.18-chromeos-x86_64.tar.xz
+binutils-2.25-chromeos-x86_64.tar.xz       glibc-2.19-chromeos-x86_64.tar.xz          linux-headers-3.18-chromeos-x86_64.tar.xz.sha1
+binutils-2.25-chromeos-x86_64.tar.xz.sha1  glibc-2.19-chromeos-x86_64.tar.xz.sha1     mpc-1.0.3-chromeos-armv7l.tar.xz
+cloog-0.18.4-chromeos-armv7l.tar.xz        gmp-6.1.2-chromeos-armv7l.tar.xz           mpc-1.0.3-chromeos-armv7l.tar.xz.sha1
+cloog-0.18.4-chromeos-armv7l.tar.xz.sha1   gmp-6.1.2-chromeos-armv7l.tar.xz.sha1      mpc-1.0.3-chromeos-i686.tar.xz
+cloog-0.18.4-chromeos-i686.tar.xz          gmp-6.1.2-chromeos-i686.tar.xz             mpc-1.0.3-chromeos-i686.tar.xz.sha1
+cloog-0.18.4-chromeos-i686.tar.xz.sha1     gmp-6.1.2-chromeos-i686.tar.xz.sha1        mpc-1.0.3-chromeos-x86_64.tar.xz
+cloog-0.18.4-chromeos-x86_64.tar.xz        gmp-6.1.2-chromeos-x86_64.tar.xz           mpc-1.0.3-chromeos-x86_64.tar.xz.sha1
+cloog-0.18.4-chromeos-x86_64.tar.xz.sha1   gmp-6.1.2-chromeos-x86_64.tar.xz.sha1      mpfr-3.1.5-chromeos-armv7l.tar.xz
+create_package.sh                          isl-0.14.1-chromeos-armv7l.tar.xz          mpfr-3.1.5-chromeos-armv7l.tar.xz.sha1
+gcc-4.9.x-chromeos-armv7l.tar.xz           isl-0.14.1-chromeos-armv7l.tar.xz.sha1     mpfr-3.1.5-chromeos-i686.tar.xz
+gcc-4.9.x-chromeos-armv7l.tar.xz.sha1      isl-0.14.1-chromeos-i686.tar.xz            mpfr-3.1.5-chromeos-i686.tar.xz.sha1
+gcc-4.9.x-chromeos-i686.tar.xz             isl-0.14.1-chromeos-i686.tar.xz.sha1       mpfr-3.1.5-chromeos-x86_64.tar.xz
+gcc-4.9.x-chromeos-i686.tar.xz.sha1        isl-0.14.1-chromeos-x86_64.tar.xz          mpfr-3.1.5-chromeos-x86_64.tar.xz.sha1
+gcc-4.9.x-chromeos-x86_64.tar.xz           isl-0.14.1-chromeos-x86_64.tar.xz.sha1
+gcc-4.9.x-chromeos-x86_64.tar.xz.sha1      linux-headers-3.18-chromeos-armv7l.tar.xz
 ```
 
 Packages
@@ -54,7 +51,7 @@ Packages
 
 Made following packages for armv7, x86 and x64.
 
-    linuxheaders, binutils, glibc, gmp, mpfr, mpc and gcc
+    linuxheaders, binutils, glibc, gmp, mpfr, mpc, isl, cloog and gcc
 
 Other packages
 --------------
@@ -86,7 +83,7 @@ If you would like to create cross compiler by your self, use following commands.
 License
 -------
 
-Copyright 2016 Kazushi (Jam) Marukawa
+@ 2016-2017 Kazushi (Jam) Marukawa, All rights reserved.
 
 This project including all of its source files is released under the terms of [GNU General Public License (version 3 or later)](http://www.gnu.org/licenses/gpl.txt)
 
