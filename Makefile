@@ -78,9 +78,8 @@ x64: $(PACKAGES_X64) $(TRIGGER_X64)
 
 $(TRIGGER_ARMV7) $(TRIGGER_X86) $(TRIGGER_X64): dist/create_package.sh
 
-dist/create_package.sh:
-	wget -q -O - "https://raw.github.com/skycocker/chromebrew/master/create_package.sh" \
-	    | sed -e 's:czf:cJf:' -e 's:.gz:.xz:g' > $@
+dist/create_package.sh: create_package.sh
+	cp $? $@
 
 #
 # Create cross compiling environment by
