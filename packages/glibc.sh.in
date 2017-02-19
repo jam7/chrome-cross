@@ -78,12 +78,24 @@ ln -s /${LIB}/ld-linux-x86-64.so.2 usr/local/${LOCALLIB}/ld-linux-x86-64.so.2
 #endif
 
 // libc.so and libpthread.so are ld script, so need to maintain symbolic links
-rm usr/local/${LOCALLIB}/libc-*
+rm usr/local/${LOCALLIB}/libc-*.so
 rm usr/local/${LOCALLIB}/libc.so.6
 ln -s /${LIB}/libc.so.6  usr/local/${LOCALLIB}/libc.so.6
 rm usr/local/${LOCALLIB}/libpthread-*.so
 rm usr/local/${LOCALLIB}/libpthread.so.0
 ln -s /${LIB}/libpthread.so.0 usr/local/${LOCALLIB}/libpthread.so.0
+
+// libm.so may be ld script also (depends on architecture and version)
+if grep 'GNU ld script' usr/local/${LOCALLIB}/libm.so > /dev/null; then
+  rm usr/local/${LOCALLIB}/libm-*.so
+  rm usr/local/${LOCALLIB}/libm.so.6
+  ln -s /${LIB}/libm.so.6  usr/local/${LOCALLIB}/libm.so.6
+  rm usr/local/${LOCALLIB}/libmvec-*.so
+  rm usr/local/${LOCALLIB}/libmvec.so*
+  ln -s /${LIB}/libmvec.so.1  usr/local/${LOCALLIB}/libmvec.so.1
+else
+  rm usr/local/${LOCALLIB}/libm[.-]*
+fi
 
 // Remove other libraries already existed in system
 
@@ -112,7 +124,6 @@ rm usr/local/${LOCALLIB}/libdl[.-]*
 #ifndef NO_MEMUSAGE
 rm usr/local/${LOCALLIB}/libmemusage[.-]*
 #endif
-rm usr/local/${LOCALLIB}/libm[.-]*
 rm usr/local/${LOCALLIB}/libnsl[.-]*
 #ifndef NO_NSSCOMPAT
 rm usr/local/${LOCALLIB}/libnss_compat[.-]*
