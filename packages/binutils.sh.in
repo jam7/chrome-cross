@@ -8,6 +8,10 @@ cd /src \
     && git clone -b ${BINUTILS_CHROMIUM_VERSION} --depth 1 "https://chromium.googlesource.com/chromiumos/third_party/binutils" /src/${BINUTILS_VERSION}
 [ "$?" != "0" ] && exit 1
 
+// fix gold/aarch64.cc problem.
+// see https://code.fossencdi.org/toolchain_binutils.git/commit/?id=ce50b1b3b1e1b45732545cffd79073afa36a5192 for details
+sed -i ${BINUTILS_VERSION}/gold/aarch64.cc -e '/Insntype adr_insn = adrp_insn & ((1 << 31) - 1);/s/1 << 31/1u << 31/'
+
 pkgname=${BINUTILS_VERSION}-chromeos-${CROS_PKG_ARCH}
 
 #ifdef CHROMEBREW_ARMV7
@@ -23,11 +27,13 @@ pkgname=${BINUTILS_VERSION}-chromeos-${CROS_PKG_ARCH}
 #ifdef USE_LIB
 mkdir -p /build/binutils \
     && cd /build/binutils \
-    && CFLAGS="-Wno-error=array-bounds" LDFLAGS="${CROS_NATIVE_LDFLAGS}" /src/${BINUTILS_VERSION}/configure \
+    && CFLAGS="-Wno-error=array-bounds" CXXFLAGS="-Wno-format" LDFLAGS="${CROS_NATIVE_LDFLAGS}" /src/${BINUTILS_VERSION}/configure \
         --prefix=${CROS_TARGET_PREFIX} \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
         --target=${CROS_TARGET} \
+        --enable-gold=yes \
+        --enable-plugins \
         ${CROS_NATIVE_GCC_OPT} \
     && make -j ${CROS_CORES} \
     && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
@@ -45,6 +51,8 @@ mkdir -p /build/binutils \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
         --target=${CROS_TARGET} \
+        --enable-gold=yes \
+        --enable-plugins \
         ${CROS_NATIVE_GCC_OPT} \
     && make -j ${CROS_CORES} \
     && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
