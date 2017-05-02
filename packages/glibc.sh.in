@@ -14,6 +14,9 @@ pkgname=${GLIBC_VERSION}-chromeos-${CROS_PKG_ARCH}
 
 // specify library directory
 
+#ifdef CHROMEBREW_ARMV8
+#define USE_LIB64
+#endif
 #ifdef CHROMEBREW_ARMV7
 #define USE_LIB
 #endif
@@ -64,6 +67,10 @@ mkdir -p /build/glibc \
 
 cd ${CROS_HOST_DEST}/${pkgname}
 
+#ifdef CHROMEBREW_ARMV8
+rm usr/local/${LOCALLIB}/ld-linux-armhf.so.3
+ln -s /${LIB}/ld-linux-armhf.so.3 usr/local/${LOCALLIB}/ld-linux-armhf.so.3
+#endif
 #ifdef CHROMEBREW_ARMV7
 rm usr/local/${LOCALLIB}/ld-linux-armhf.so.3
 ln -s /${LIB}/ld-linux-armhf.so.3 usr/local/${LOCALLIB}/ld-linux-armhf.so.3

@@ -14,6 +14,9 @@ sed -i ${BINUTILS_VERSION}/gold/aarch64.cc -e '/Insntype adr_insn = adrp_insn & 
 
 pkgname=${BINUTILS_VERSION}-chromeos-${CROS_PKG_ARCH}
 
+#ifdef CHROMEBREW_ARMV8
+#define USE_LIB64
+#endif
 #ifdef CHROMEBREW_ARMV7
 #define USE_LIB
 #endif
