@@ -2,7 +2,7 @@ chrome-cross
 ============
 Toolchain builder for chromebrew
 
-**Support X86, X86-64, ARM chipsets, but not tested on X86**
+**Support X86, X86-64, ARM and AARCH64 chipsets, but not tested on AARCH64 yet**
 
 Overview
 --------
@@ -19,7 +19,7 @@ Usage
 
 Make packages using cross compiler by following commands.  This may download docker images for cross comppiler.
 
-    make armv7 | x86 | x64 | all
+    make armv8 | armv7 | x86 | x64 | all
 
 You will get toolchains under dist directory.
 
@@ -49,7 +49,7 @@ gcc-4.9.x-chromeos-x86_64.tar.xz.sha1      linux-headers-3.18-chromeos-armv7l.ta
 Packages
 --------
 
-Made following packages for armv7, x86 and x64.
+Made following packages for armv8, armv7, x86 and x64.
 
     linuxheaders, binutils, glibc, gmp, mpfr, mpc, isl, cloog and gcc
 
@@ -67,6 +67,7 @@ All binary and shared libraries are compiled with appropriate -rpath options lik
 
 |chipset|uname -m|rpaths|
 |:---:|:---:|---|
+|arm64|aarch64|/usr/local/lib:/usr/local/lib64|
 |armv7l|armv7l|/usr/local/lib|
 |x86|i686|/usr/local/lib|
 |x64|x86\_64|/usr/local/lib:/usr/local/lib64|
@@ -78,7 +79,7 @@ Cross Compiler
 
 If you would like to create cross compiler by your self, use following commands.
 
-    make cross-armv7 | cross-x86 | cross-x64 | cross
+    make cross-armv8 | cross-armv7 | cross-x86 | cross-x64 | cross
 
 License
 -------
