@@ -33,7 +33,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ENV PATH ${CROS_HOST_PREFIX}/bin:$PATH
 
 WORKDIR /src
-RUN wget -q "ftp://www.kernel.org/pub/linux/kernel/v3.x/${LINUX_VERSION}.tar.xz" \
+RUN wget -q "https://www.kernel.org/pub/linux/kernel/v3.x/${LINUX_VERSION}.tar.xz" \
     && tar xfk ${LINUX_VERSION}.tar.xz \
     && rm ${LINUX_VERSION}.tar.xz \
     && cd /src/${LINUX_VERSION} \

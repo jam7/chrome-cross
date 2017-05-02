@@ -5,7 +5,7 @@
 // linux-headers
 
 cd /src \
-    && wget -q "ftp://www.kernel.org/pub/linux/kernel/v3.x/${LINUX_VERSION}.tar.xz" \
+    && wget -q "https://www.kernel.org/pub/linux/kernel/v3.x/${LINUX_VERSION}.tar.xz" \
     && tar xfk ${LINUX_VERSION}.tar.xz \
     && rm ${LINUX_VERSION}.tar.xz
 [ "$?" != "0" ] && exit 1
