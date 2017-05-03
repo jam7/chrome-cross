@@ -12,7 +12,7 @@ cd /src \
 // see https://code.fossencdi.org/toolchain_binutils.git/commit/?id=ce50b1b3b1e1b45732545cffd79073afa36a5192 for details
 sed -i ${BINUTILS_VERSION}/gold/aarch64.cc -e '/Insntype adr_insn = adrp_insn & ((1 << 31) - 1);/s/1 << 31/1u << 31/'
 
-pkgname=${BINUTILS_VERSION}-chromeos-${CROS_PKG_ARCH}
+pkgname=${BINUTILS_VERSION}${CC_VERSION}-chromeos-${CROS_PKG_ARCH}
 
 #ifdef CHROMEBREW_ARMV8
 #define USE_LIB64

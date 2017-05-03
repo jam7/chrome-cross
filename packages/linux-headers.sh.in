@@ -10,7 +10,7 @@ cd /src \
     && rm ${LINUX_VERSION}.tar.xz
 [ "$?" != "0" ] && exit 1
 
-pkgname=linux-headers-$(echo ${LINUX_VERSION} | sed -e s:linux-::)-chromeos-${CROS_PKG_ARCH}
+pkgname=linux-headers-$(echo ${LINUX_VERSION} | sed -e s:linux-::)${CC_VERSION}-chromeos-${CROS_PKG_ARCH}
 cd /src/${LINUX_VERSION} \
     && make mrproper \
     && make ARCH=${CROS_KERNEL_ARCH} INSTALL_HDR_PATH=${CROS_HOST_DEST}/${pkgname}/${CROS_TARGET_PREFIX} headers_install \

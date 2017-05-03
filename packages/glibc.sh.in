@@ -10,7 +10,7 @@ cd /src \
     && rm -rf ${GLIBC_VERSION}.tar.gz
 [ "$?" != "0" ] && exit 1
 
-pkgname=${GLIBC_VERSION}-chromeos-${CROS_PKG_ARCH}
+pkgname=${GLIBC_VERSION}${CC_VERSION}-chromeos-${CROS_PKG_ARCH}
 
 // specify library directory
 
