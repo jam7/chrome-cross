@@ -106,5 +106,5 @@ RUN wget -q "ftp://ftp.gnu.org/gnu/gmp/${GMP_VERSION}.tar.bz2" \
     && cd .. \
     && rm -rf "$gccdir" \
     && rm -rf "$glibcdir" \
-    && rm -rf "/src/${GMP_VERSION}" "/src/${MPFR_VERSION}" "/src/${MPC_VERSION}" "/src/${GLIBC_VERSION}" "/src/${GCC_VERSION}" \
+    && rm -rf "/src/${GMP_VERSION}" "/src/${MPFR_VERSION}" "/src/${MPC_VERSION}" "/src/${ISL_VERSION}" "/src/${CLOOG_VERSION}" "/src/${GLIBC_VERSION}" "/src/${GCC_VERSION}"
 
