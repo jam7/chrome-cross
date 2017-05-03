@@ -27,8 +27,8 @@ mkdir -p /build/gmp \
         --enable-cxx \
         --with-sysroot=${CROS_HOST_PREFIX}/${CROS_TARGET} \
     && make -j ${CROS_CORES} \
-    && make DESTDIR=${CROS_HOST_PREFIX}/${CROS_TARGET} install \
-    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && make DESTDIR=${CROS_HOST_PREFIX}/${CROS_TARGET} install-strip \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install-strip \
     && cd ${CROS_HOST_DEST}/${pkgname} \
     && sh ../create_package.sh \
     && rm -rf ${CROS_HOST_DEST}/${pkgname}
@@ -48,8 +48,8 @@ mkdir -p /build/mpfr \
         --with-gmp-include=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX}/include \
         --with-gmp-lib=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB} \
     && make -j ${CROS_CORES} \
-    && make DESTDIR=${CROS_HOST_PREFIX}/${CROS_TARGET} install \
-    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && make DESTDIR=${CROS_HOST_PREFIX}/${CROS_TARGET} install-strip \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install-strip \
     && cd ${CROS_HOST_DEST}/${pkgname} \
     && sh ../create_package.sh \
     && rm -rf ${CROS_HOST_DEST}/${pkgname}
@@ -71,8 +71,8 @@ mkdir -p /build/mpc \
         --with-mpfr-include=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX}/include \
         --with-mpfr-lib=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB} \
     && make -j ${CROS_CORES} \
-    && make DESTDIR=${CROS_HOST_PREFIX}/${CROS_TARGET} install \
-    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && make DESTDIR=${CROS_HOST_PREFIX}/${CROS_TARGET} install-strip \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install-strip \
     && cd ${CROS_HOST_DEST}/${pkgname} \
     && sh ../create_package.sh \
     && rm -rf ${CROS_HOST_DEST}/${pkgname}
@@ -91,8 +91,8 @@ mkdir -p /build/isl \
         --with-sysroot=${CROS_HOST_PREFIX}/${CROS_TARGET} \
         --with-gmp-prefix=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
     && make -j ${CROS_CORES} \
-    && make DESTDIR=${CROS_HOST_PREFIX}/${CROS_TARGET} install \
-    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && make DESTDIR=${CROS_HOST_PREFIX}/${CROS_TARGET} install-strip \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install-strip \
     && cd ${CROS_HOST_DEST}/${pkgname} \
     && sh ../create_package.sh \
     && rm -rf ${CROS_HOST_DEST}/${pkgname}
@@ -116,8 +116,8 @@ mkdir -p /build/cloog \
         --with-gmp-prefix=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
         --with-isl-prefix=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
     && make -j ${CROS_CORES} \
-    && make DESTDIR=${CROS_HOST_PREFIX}/${CROS_TARGET} install \
-    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && make DESTDIR=${CROS_HOST_PREFIX}/${CROS_TARGET} install-strip \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install-strip \
     && cd ${CROS_HOST_DEST}/${pkgname} \
     && sh ../create_package.sh \
     && rm -rf ${CROS_HOST_DEST}/${pkgname}
@@ -157,7 +157,7 @@ mkdir -p /build/gcc \
         --with-cloog-lib=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB} \
         ${CROS_NATIVE_GCC_OPT} \
     && make -j ${CROS_CORES} \
-    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install-strip \
     && cd ${CROS_HOST_DEST}/${pkgname} \
     && sh ../create_package.sh \
     && rm -rf ${CROS_HOST_DEST}/${pkgname}

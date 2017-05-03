@@ -67,6 +67,9 @@ mkdir -p /build/glibc \
 
 cd ${CROS_HOST_DEST}/${pkgname}
 
+// strip all
+find usr/local/${LOCALLIB}/ -type f | xargs ${CROS_HOST_PREFIX}/${CROS_TARGET}/bin/strip -S
+
 #ifdef CHROMEBREW_ARMV8
 rm usr/local/${LOCALLIB}/ld-linux-armhf.so.3
 ln -s /${LIB}/ld-linux-armhf.so.3 usr/local/${LOCALLIB}/ld-linux-armhf.so.3

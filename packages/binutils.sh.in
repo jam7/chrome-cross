@@ -39,7 +39,7 @@ mkdir -p /build/binutils \
         --enable-plugins \
         ${CROS_NATIVE_GCC_OPT} \
     && make -j ${CROS_CORES} \
-    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install-strip \
     && cd ${CROS_HOST_DEST}/${pkgname} \
     && sh ../create_package.sh \
     && rm -rf ${CROS_HOST_DEST}/${pkgname}
@@ -58,7 +58,7 @@ mkdir -p /build/binutils \
         --enable-plugins \
         ${CROS_NATIVE_GCC_OPT} \
     && make -j ${CROS_CORES} \
-    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install-strip \
     && ln -s ../lib ${CROS_HOST_DEST}/${pkgname}/${CROS_TARGET_PREFIX}/${CROS_TARGET}/lib64 /*1*/ \
     && cd ${CROS_HOST_DEST}/${pkgname} \
     && sh ../create_package.sh \
