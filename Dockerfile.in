@@ -80,7 +80,7 @@ RUN wget -q "ftp://ftp.gnu.org/gnu/gmp/${GMP_VERSION}.tar.bz2" \
         --build=${CROS_HOST} \
         --host=${CROS_HOST} \
         --target=${CROS_TARGET} \
-        --enable-languages=c,c++ \
+        --enable-languages=c,c++,fortran \
         ${CROS_CROSS_GCC_OPT} \
     && make -j ${CROS_CORES} all-gcc \
     && make install-gcc \

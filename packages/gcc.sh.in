@@ -144,7 +144,7 @@ mkdir -p /build/gcc \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
         --target=${CROS_TARGET} \
-        --enable-languages=c,c++ \
+        --enable-languages=c,c++,fortran \
         --with-gmp-include=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX}/include \
         --with-gmp-lib=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB} \
         --with-mpfr-include=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX}/include \
