@@ -37,6 +37,8 @@ mkdir -p /build/binutils \
         --target=${CROS_TARGET} \
         --enable-gold=yes \
         --enable-plugins \
+        --enable-shared \
+        --disable-static \
         ${CROS_NATIVE_GCC_OPT} \
     && make -j ${CROS_CORES} \
     && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install-strip \
@@ -56,6 +58,8 @@ mkdir -p /build/binutils \
         --target=${CROS_TARGET} \
         --enable-gold=yes \
         --enable-plugins \
+        --enable-shared \
+        --disable-static \
         ${CROS_NATIVE_GCC_OPT} \
     && make -j ${CROS_CORES} \
     && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install-strip \

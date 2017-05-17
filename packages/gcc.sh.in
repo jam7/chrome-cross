@@ -25,6 +25,7 @@ mkdir -p /build/gmp \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
         --enable-cxx \
+        --disable-static \
         --with-sysroot=${CROS_HOST_PREFIX}/${CROS_TARGET} \
     && make -j ${CROS_CORES} \
     && make DESTDIR=${CROS_HOST_PREFIX}/${CROS_TARGET} install-strip \
@@ -44,6 +45,7 @@ mkdir -p /build/mpfr \
         --libdir=${CROS_TARGET_LIB} \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
+        --disable-static \
         --with-sysroot=${CROS_HOST_PREFIX}/${CROS_TARGET} \
         --with-gmp-include=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX}/include \
         --with-gmp-lib=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB} \
@@ -65,6 +67,7 @@ mkdir -p /build/mpc \
         --libdir=${CROS_TARGET_LIB} \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
+        --disable-static \
         --with-sysroot=${CROS_HOST_PREFIX}/${CROS_TARGET} \
         --with-gmp-include=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX}/include \
         --with-gmp-lib=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB} \
@@ -88,6 +91,7 @@ mkdir -p /build/isl \
         --libdir=${CROS_TARGET_LIB} \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
+        --disable-static \
         --with-sysroot=${CROS_HOST_PREFIX}/${CROS_TARGET} \
         --with-gmp-prefix=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
     && make -j ${CROS_CORES} \
@@ -112,6 +116,7 @@ mkdir -p /build/cloog \
         --libdir=${CROS_TARGET_LIB} \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
+        --disable-static \
         --with-sysroot=${CROS_HOST_PREFIX}/${CROS_TARGET} \
         --with-gmp-prefix=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
         --with-isl-prefix=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
@@ -145,6 +150,7 @@ mkdir -p /build/gcc \
         --host=${CROS_TARGET} \
         --target=${CROS_TARGET} \
         --enable-languages=c,c++,fortran \
+        --disable-static \
         --with-gmp-include=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX}/include \
         --with-gmp-lib=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB} \
         --with-mpfr-include=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX}/include \
@@ -158,6 +164,7 @@ mkdir -p /build/gcc \
         ${CROS_NATIVE_GCC_OPT} \
     && make -j ${CROS_CORES} \
     && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install-strip \
+    && find ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_LIB} -maxdepth 1 -name '*.a' | grep -v nonshared.a | xargs rm \
     && cd ${CROS_HOST_DEST}/${pkgname} \
     && sh ../create_package.sh \
     && rm -rf ${CROS_HOST_DEST}/${pkgname}
