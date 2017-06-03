@@ -15,7 +15,7 @@ pkgname=${GLIBC_VERSION}${CC_VERSION}-chromeos-${CROS_PKG_ARCH}
 // specify library directory
 
 #ifdef CHROMEBREW_ARMV8
-#define USE_LIB64
+#define USE_LIB
 #endif
 #ifdef CHROMEBREW_ARMV7
 #define USE_LIB
