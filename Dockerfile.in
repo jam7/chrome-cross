@@ -62,9 +62,9 @@ RUN wget -q "ftp://ftp.gnu.org/gnu/gmp/${GMP_VERSION}.tar.bz2" \
     && wget -q "http://isl.gforge.inria.fr/${ISL_VERSION}.tar.xz" \
     && wget -q "http://www.bastoul.net/cloog/pages/download/count.php3?url=./${CLOOG_VERSION}.tar.gz" -O "${CLOOG_VERSION}.tar.gz" \
     && wget -q "ftp://ftp.gnu.org/gnu/glibc/${GLIBC_VERSION}.tar.gz" \
+    && wget -q "ftp://gcc.gnu.org/pub/gcc/releases/${GCC_VERSION}/${GCC_VERSION}.tar.bz2" \
     && for f in *.tar*; do tar xfk $f; done \
     && rm -rf *.tar* \
-    && git clone -b ${GCC_CHROMIUM_VERSION} --depth 1 "https://chromium.googlesource.com/chromiumos/third_party/gcc" /src/${GCC_VERSION} \
     && cd /src/${GCC_VERSION} \
     && ln -s ../${GMP_VERSION} gmp \
     && ln -s ../${MPFR_VERSION} mpfr \
@@ -81,6 +81,8 @@ RUN wget -q "ftp://ftp.gnu.org/gnu/gmp/${GMP_VERSION}.tar.bz2" \
         --host=${CROS_HOST} \
         --target=${CROS_TARGET} \
         --enable-languages=c,c++,fortran \
+        --disable-staic \
+        --disable-werror \
         ${CROS_CROSS_GCC_OPT} \
     && make -j ${CROS_CORES} all-gcc \
     && make install-gcc \
@@ -91,6 +93,9 @@ RUN wget -q "ftp://ftp.gnu.org/gnu/gmp/${GMP_VERSION}.tar.bz2" \
         --host=${CROS_TARGET} \
         --target=${CROS_TARGET} \
         --with-headers=${CROS_HOST_PREFIX}/${CROS_TARGET}/include \
+        --disable-werror \
+        --enable-shared \
+        --disable-staic \
         ${CROS_CROSS_LIBC_OPT} \
     && make install-bootstrap-headers=yes install-headers \
     && make -j ${CROS_CORES} csu/subdir_lib \
@@ -103,7 +108,7 @@ RUN wget -q "ftp://ftp.gnu.org/gnu/gmp/${GMP_VERSION}.tar.bz2" \
     && make -j ${CROS_CORES} && make install \
     && cd "$gccdir" \
     && make -j ${CROS_CORES} all && make install-strip \
-    && cd .. \
+    && cd / \
     && rm -rf "$gccdir" \
     && rm -rf "$glibcdir" \
     && rm -rf "/src/${GMP_VERSION}" "/src/${MPFR_VERSION}" "/src/${MPC_VERSION}" "/src/${ISL_VERSION}" "/src/${CLOOG_VERSION}" "/src/${GLIBC_VERSION}" "/src/${GCC_VERSION}"
