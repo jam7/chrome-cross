@@ -41,6 +41,7 @@ mkdir -p /build/glibc \
         --enable-shared \
         --disable-sanity-checks \
         --disable-static \
+        --disable-werror \
     && make -j ${CROS_CORES} \
     && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install
 #endif
@@ -61,6 +62,7 @@ mkdir -p /build/glibc \
         --enable-shared \
         --disable-sanity-checks \
         --disable-static \
+        --disable-werror \
     && make -j ${CROS_CORES} \
     && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install
 #endif
