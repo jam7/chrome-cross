@@ -136,7 +136,6 @@ cross-x86/image: cross-x86/Dockerfile
 	       --build-arg NPROCS=$(NPROCS) \
 		cross-x86
 	touch $@
-cross-armv7/Dockerfile: Dockerfile.in env.docker
 cross-x86/Dockerfile: Dockerfile.in env.docker
 	cpp -DCHROMEBREW_X86 -Ulinux -P -o $@ Dockerfile.in
 
@@ -149,7 +148,6 @@ cross-x64/image: cross-x64/Dockerfile
 	       --build-arg NPROCS=$(NPROCS) \
 		cross-x64
 	touch $@
-cross-armv7/Dockerfile: Dockerfile.in env.docker
 cross-x64/Dockerfile: Dockerfile.in env.docker
 	cpp -DCHROMEBREW_X64 -Ulinux -P -o $@ Dockerfile.in
 
