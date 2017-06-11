@@ -22,6 +22,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         flex \
         gawk \
         texinfo \
+        perl \
     && rm -rf /var/cache/apt/archives /var/lib/apt/lists
 
 // cross
