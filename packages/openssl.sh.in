@@ -12,14 +12,27 @@ cd /src \
     && tar xfk *.tar*
 [ "$?" != "0" ] && exit 1
 
-// binutils
+// openssl
+
+#ifdef CHROMEBREW_ARMV8
+ENV OPENSSL_TARGET linux-armv4 -Wa,--noexecstack -march=armv7-a
+#endif
+#ifdef CHROMEBREW_ARMV7
+ENV OPENSSL_TARGET linux-armv4 -Wa,--noexecstack -march=armv7-a
+#endif
+#ifdef CHROMEBREW_X86
+ENV OPENSSL_TARGET linux-elf -Wa,--noexecstack
+#endif
+#ifdef CHROMEBREW_X64
+ENV OPENSSL_TARGET linux-x86_64 -Wa,--noexecstack
+#endif
 
 pkgname=${OPENSSL_VERSION}${CC_VERSION}-chromeos-${CROS_PKG_ARCH} \
     && cd /src/openssl* \
     && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib ./Configure \
         --prefix=${CROS_TARGET_PREFIX} \
         --openssldir=/etc/ssl \
-        shared zlib-dynamic linux-armv4 -march=armv7-a \
+        shared zlib-dynamic ${OPENSSL_TARGET} \
     && make \
     && find . -name '*.so' -print | xargs ${CROS_TARGET}-strip -S \
     && find . -name '*.so.*' -print | xargs ${CROS_TARGET}-strip -S \

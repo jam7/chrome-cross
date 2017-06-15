@@ -115,6 +115,8 @@ RUN wget -q "ftp://ftp.gnu.org/gnu/gmp/${GMP_VERSION}.tar.bz2" \
     && rm -rf "$glibcdir" \
     && rm -rf "/src/${GMP_VERSION}" "/src/${MPFR_VERSION}" "/src/${MPC_VERSION}" "/src/${ISL_VERSION}" "/src/${CLOOG_VERSION}" "/src/${GLIBC_VERSION}" "/src/${GCC_VERSION}"
 
+ENV ZLIB_VERSION zlib-1.2.11
+
 RUN wget -q "http://zlib.net/${ZLIB_VERSION}.tar.gz" \
     && tar xfk ${ZLIB_VERSION}.tar* \
     && rm -rf ${ZLIB_VERSION}.tar* \
@@ -125,16 +127,16 @@ RUN wget -q "http://zlib.net/${ZLIB_VERSION}.tar.gz" \
     && rm -rf "/src/${ZLIB_VERSION}"
 
 #ifdef CHROMEBREW_ARMV8
-ENV OPENSSL_TARGET linux-armv4 -march=armv7-a
+ENV OPENSSL_TARGET linux-armv4 -Wa,--noexecstack -march=armv7-a
 #endif
 #ifdef CHROMEBREW_ARMV7
-ENV OPENSSL_TARGET linux-armv4 -march=armv7-a
+ENV OPENSSL_TARGET linux-armv4 -Wa,--noexecstack -march=armv7-a
 #endif
 #ifdef CHROMEBREW_X86
-ENV OPENSSL_TARGET
+ENV OPENSSL_TARGET linux-elf -Wa,--noexecstack
 #endif
 #ifdef CHROMEBREW_X64
-ENV OPENSSL_TARGET
+ENV OPENSSL_TARGET linux-x86_64 -Wa,--noexecstack
 #endif
 
 RUN wget -q "https://github.com/openssl/openssl/archive/OpenSSL_1_0_2l.tar.gz" \
