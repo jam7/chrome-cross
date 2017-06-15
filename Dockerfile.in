@@ -123,3 +123,28 @@ RUN wget -q "http://zlib.net/${ZLIB_VERSION}.tar.gz" \
     && make \
     && make install \
     && rm -rf "/src/${ZLIB_VERSION}"
+
+#ifdef CHROMEBREW_ARMV8
+ENV OPENSSL_TARGET linux-armv4 -march=armv7-a
+#endif
+#ifdef CHROMEBREW_ARMV7
+ENV OPENSSL_TARGET linux-armv4 -march=armv7-a
+#endif
+#ifdef CHROMEBREW_X86
+ENV OPENSSL_TARGET
+#endif
+#ifdef CHROMEBREW_X64
+ENV OPENSSL_TARGET
+#endif
+
+RUN wget -q "https://github.com/openssl/openssl/archive/OpenSSL_1_0_2l.tar.gz" \
+    && tar xfk OpenSSL_1_0_2l.tar.gz \
+    && rm -rf OpenSSL_1_0_2l.tar.gz \
+    && cd /src/openssl* \
+    && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib ./Configure \
+      --prefix=${CROS_HOST_PREFIX}/${CROS_TARGET} \
+      --openssldir=/etc/ssl \
+      shared zlib-dynamic ${OPENSSL_TARGET} \
+    && make \
+    && make install \
+    && rm -rf /src/openssl*

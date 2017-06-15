@@ -1,0 +1,31 @@
+// native compilation
+
+#include "../env.docker"
+
+// prepare sources
+
+LIBSSH2_VERSION="libssh2-1.8.0"
+
+set -x
+cd /src \
+    && wget -cq "https://www.libssh2.org/download/libssh2-1.8.0.tar.gz" \
+    && tar xfk *.tar*
+[ "$?" != "0" ] && exit 1
+
+// binutils
+
+pkgname=${LIBSSH2_VERSION}${CC_VERSION}-chromeos-${CROS_PKG_ARCH} \
+    && cd /src/${LIBSSH2_VERSION} \
+    && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib ./configure \
+        --prefix=${CROS_TARGET_PREFIX} \
+        --build=${CROS_HOST} \
+        --host=${CROS_TARGET} \
+        --with-libz-prefix=${CROS_HOST_PREFIX}/${CROS_TARGET} \
+        --with-libssl-prefix=${CROS_HOST_PREFIX}/${CROS_TARGET} \
+        --disable-static \
+    && make \
+    && find . -name '*.so.*' -print | xargs ${CROS_TARGET}-strip -S \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && cd "${CROS_HOST_DEST}/${pkgname}" \
+    && sh ../create_package.sh \
+    && rm -rf "${CROS_HOST_DEST}/${pkgname}"
