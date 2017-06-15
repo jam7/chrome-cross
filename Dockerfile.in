@@ -23,6 +23,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         gawk \
         texinfo \
         perl \
+        gettext \
     && rm -rf /var/cache/apt/archives /var/lib/apt/lists
 
 // cross
@@ -114,3 +115,11 @@ RUN wget -q "ftp://ftp.gnu.org/gnu/gmp/${GMP_VERSION}.tar.bz2" \
     && rm -rf "$glibcdir" \
     && rm -rf "/src/${GMP_VERSION}" "/src/${MPFR_VERSION}" "/src/${MPC_VERSION}" "/src/${ISL_VERSION}" "/src/${CLOOG_VERSION}" "/src/${GLIBC_VERSION}" "/src/${GCC_VERSION}"
 
+RUN wget -q "http://zlib.net/${ZLIB_VERSION}.tar.gz" \
+    && tar xfk ${ZLIB_VERSION}.tar* \
+    && rm -rf ${ZLIB_VERSION}.tar* \
+    && cd "/src/${ZLIB_VERSION}" \
+    && CC=${CROS_TARGET}-gcc ./configure --prefix=${CROS_HOST_PREFIX}/${CROS_TARGET} \
+    && make \
+    && make install \
+    && rm -rf "/src/${ZLIB_VERSION}"

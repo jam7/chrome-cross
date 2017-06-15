@@ -1,0 +1,31 @@
+// native compilation
+
+#include "../env.docker"
+
+// prepare sources
+
+OPENSSL_VERSION="openssl-1.0.2l"
+
+set -x
+cd /src \
+    && wget -q "https://github.com/openssl/openssl/archive/OpenSSL_1_0_2l.tar.gz" \
+    && tar xfk *.tar*
+[ "$?" != "0" ] && exit 1
+
+// binutils
+
+pkgname=${OPENSSL_VERSION}${CC_VERSION}-chromeos-${CROS_PKG_ARCH} \
+    && cd /src/openssl* \
+    && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib ./Configure \
+        --prefix=${CROS_TARGET_PREFIX} \
+        --openssldir=/etc/ssl \
+        shared zlib-dynamic linux-armv4 -march=armv7-a \
+    && make \
+    && find . -name '*.so' -print | xargs ${CROS_TARGET}-strip -S \
+    && find . -name '*.so.*' -print | xargs ${CROS_TARGET}-strip -S \
+    && make INSTALL_PREFIX=${CROS_HOST_DEST}/${pkgname} install \
+    && mv ${CROS_HOST_DEST}/${pkgname}/etc/ssl/man ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_PREFIX} \
+    && rm -rf ${CROS_HOST_DEST}/${pkgname}/etc \
+    && cd "${CROS_HOST_DEST}/${pkgname}" \
+    && sh ../create_package.sh \
+    && rm -rf "${CROS_HOST_DEST}/${pkgname}"
