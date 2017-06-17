@@ -1,5 +1,6 @@
 ORG = jam7
 NPROCS = `nproc`
+VERSION = v1.7
 
 PACKAGES = linux-headers binutils gcc glibc libssh2 git ruby
 PACKAGES_ARMV8 = $(PACKAGES:%=cross-armv8/%.sh)
@@ -149,6 +150,12 @@ cross-x64/image: cross-x64/Dockerfile
 	touch $@
 cross-x64/Dockerfile: Dockerfile.in env.docker
 	cpp -DCHROMEBREW_X64 -Ulinux -P -o $@ Dockerfile.in
+
+dockertag:
+	docker tag $(ORG)/cross-armv7 $(ORG)/cross-armv7:$(VERSION)
+	docker tag $(ORG)/cross-armv8 $(ORG)/cross-armv8:$(VERSION)
+	docker tag $(ORG)/cross-x64 $(ORG)/cross-x64:$(VERSION)
+	docker tag $(ORG)/cross-x86 $(ORG)/cross-x86:$(VERSION)
 
 
 FORCE:
