@@ -33,7 +33,7 @@ pkgname=${OPENSSL_VERSION}-chromeos-${CROS_PKG_ARCH} \
         --prefix=${CROS_TARGET_PREFIX} \
         --openssldir=/etc/ssl \
         shared zlib-dynamic ${OPENSSL_TARGET} \
-    && make \
+    && make -j ${CROS_CORES} \
     && find . -name '*.so' -print | xargs ${CROS_TARGET}-strip -S \
     && find . -name '*.so.*' -print | xargs ${CROS_TARGET}-strip -S \
     && make INSTALL_PREFIX=${CROS_HOST_DEST}/${pkgname} install \

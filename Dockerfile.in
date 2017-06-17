@@ -139,7 +139,7 @@ RUN wget -q "http://zlib.net/${ZLIB_VERSION}.tar.gz" \
     && rm -rf ${ZLIB_VERSION}.tar* \
     && cd "/src/${ZLIB_VERSION}" \
     && CC=${CROS_TARGET}-gcc ./configure --prefix=${CROS_HOST_PREFIX}/${CROS_TARGET} \
-    && make \
+    && make -j ${CROS_CORES} \
     && make install \
     && rm -rf "/src/${ZLIB_VERSION}"
 
@@ -164,6 +164,6 @@ RUN wget -q "https://github.com/openssl/openssl/archive/OpenSSL_1_0_2l.tar.gz" \
       --prefix=${CROS_HOST_PREFIX}/${CROS_TARGET} \
       --openssldir=/etc/ssl \
       shared zlib-dynamic ${OPENSSL_TARGET} \
-    && make \
+    && make -j ${CROS_CORES} \
     && make install \
     && rm -rf /src/openssl*

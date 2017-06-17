@@ -23,7 +23,7 @@ pkgname=${LIBSSH2_VERSION}-chromeos-${CROS_PKG_ARCH} \
         --with-libz-prefix=${CROS_HOST_PREFIX}/${CROS_TARGET} \
         --with-libssl-prefix=${CROS_HOST_PREFIX}/${CROS_TARGET} \
         --disable-static \
-    && make \
+    && make -j ${CROS_CORES} \
     && find . -name '*.so.*' -print | xargs ${CROS_TARGET}-strip -S \
     && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
     && cd "${CROS_HOST_DEST}/${pkgname}" \

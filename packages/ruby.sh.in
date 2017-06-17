@@ -22,7 +22,7 @@ cd /src/ncurses* \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
         --with-shared \
-    && make \
+    && make -j ${CROS_CORES} \
     && make install
 [ "$?" != "0" ] && exit 1
 
@@ -33,7 +33,7 @@ cd /src/readline* \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
         --with-curses \
-    && make \
+    && make -j ${CROS_CORES} \
     && make install
 [ "$?" != "0" ] && exit 1
 
@@ -48,7 +48,7 @@ pkgname=${RUBY_VERSION}-chromeos-${CROS_PKG_ARCH} \
         --with-baseruby=ruby \
         --with-zlib-dir=${CROS_HOST_PREFIX}/${CROS_TARGET} \
         --with-readline-dir=${CROS_HOST_PREFIX}/${CROS_TARGET} \
-    && make \
+    && make -j ${CROS_CORES} \
     && find . -name '*.so' -print | xargs ${CROS_TARGET}-strip -S \
     && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
     && ${CROS_TARGET}-strip ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_PREFIX}/bin/ruby \
