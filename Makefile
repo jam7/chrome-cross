@@ -1,7 +1,7 @@
 ORG = jam7
 NPROCS = `nproc`
 
-PACKAGES = linux-headers binutils gcc glibc
+PACKAGES = linux-headers binutils gcc glibc libssh2 git ruby
 PACKAGES_ARMV8 = $(PACKAGES:%=cross-armv8/%.sh)
 PACKAGES_ARMV7 = $(PACKAGES:%=cross-armv7/%.sh)
 PACKAGES_X86 = $(PACKAGES:%=cross-x86/%.sh)
