@@ -144,7 +144,7 @@ RUN wget -q "http://zlib.net/${ZLIB_VERSION}.tar.gz" \
     && rm -rf "/src/${ZLIB_VERSION}"
 
 #ifdef CHROMEBREW_ARMV8
-ENV OPENSSL_TARGET linux-armv4 -Wa,--noexecstack -march=armv7-a
+ENV OPENSSL_TARGET linux-armv4 -Wa,--noexecstack -march=armv8-a no-asm
 #endif
 #ifdef CHROMEBREW_ARMV7
 ENV OPENSSL_TARGET linux-armv4 -Wa,--noexecstack -march=armv7-a

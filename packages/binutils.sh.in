@@ -18,7 +18,7 @@ sed -i ${BINUTILS_VERSION}/gold/dwarf_reader.cc -e '/std::make_pair<int, std::st
 pkgname=${BINUTILS_VERSION}-chromeos-${CROS_PKG_ARCH}
 
 #ifdef CHROMEBREW_ARMV8
-#define USE_LIB
+#define USE_LIB64
 #endif
 #ifdef CHROMEBREW_ARMV7
 #define USE_LIB
