@@ -14,7 +14,7 @@ cd /src \
 
 // binutils
 
-pkgname=${LIBSSH2_VERSION}${CC_VERSION}-chromeos-${CROS_PKG_ARCH} \
+pkgname=${LIBSSH2_VERSION}-chromeos-${CROS_PKG_ARCH} \
     && cd /src/${LIBSSH2_VERSION} \
     && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib ./configure \
         --prefix=${CROS_TARGET_PREFIX} \

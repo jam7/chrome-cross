@@ -14,7 +14,7 @@ cd /src \
 
 // binutils
 
-pkgname=${GIT_VERSION}${CC_VERSION}-chromeos-${CROS_PKG_ARCH} \
+pkgname=${GIT_VERSION}-chromeos-${CROS_PKG_ARCH} \
     && cd /src/${GIT_VERSION}* \
     && make configure \
     && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib ./configure \

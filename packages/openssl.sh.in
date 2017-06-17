@@ -27,7 +27,7 @@ ENV OPENSSL_TARGET linux-elf -Wa,--noexecstack
 ENV OPENSSL_TARGET linux-x86_64 -Wa,--noexecstack
 #endif
 
-pkgname=${OPENSSL_VERSION}${CC_VERSION}-chromeos-${CROS_PKG_ARCH} \
+pkgname=${OPENSSL_VERSION}-chromeos-${CROS_PKG_ARCH} \
     && cd /src/openssl* \
     && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib ./Configure \
         --prefix=${CROS_TARGET_PREFIX} \

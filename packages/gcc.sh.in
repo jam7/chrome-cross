@@ -31,7 +31,7 @@ cd /src \
 
 // gmp
 
-pkgname=${GMP_VERSION}${CC_VERSION}-chromeos-${CROS_PKG_ARCH}
+pkgname=${GMP_VERSION}-chromeos-${CROS_PKG_ARCH}
 mkdir -p /build/gmp \
     && cd /build/gmp \
     && LDFLAGS=${CROS_NATIVE_LDFLAGS} /src/${GMP_VERSION}/configure \
@@ -52,7 +52,7 @@ mkdir -p /build/gmp \
 
 // mpfr
 
-pkgname=${MPFR_VERSION}${CC_VERSION}-chromeos-${CROS_PKG_ARCH}
+pkgname=${MPFR_VERSION}-chromeos-${CROS_PKG_ARCH}
 mkdir -p /build/mpfr \
     && cd /build/mpfr \
     && LDFLAGS=${CROS_NATIVE_LDFLAGS} /src/${MPFR_VERSION}/configure \
@@ -74,7 +74,7 @@ mkdir -p /build/mpfr \
 
 // mpc
 
-pkgname=${MPC_VERSION}${CC_VERSION}-chromeos-${CROS_PKG_ARCH}
+pkgname=${MPC_VERSION}-chromeos-${CROS_PKG_ARCH}
 mkdir -p /build/mpc \
     && cd /build/mpc \
     && LDFLAGS=${CROS_NATIVE_LDFLAGS} /src/${MPC_VERSION}/configure \
@@ -98,7 +98,7 @@ mkdir -p /build/mpc \
 
 // isl
 
-pkgname=${ISL_VERSION}${CC_VERSION}-chromeos-${CROS_PKG_ARCH}
+pkgname=${ISL_VERSION}-chromeos-${CROS_PKG_ARCH}
 mkdir -p /build/isl \
     && cd /build/isl \
     && LDFLAGS=${CROS_NATIVE_LDFLAGS} /src/${ISL_VERSION}/configure \
@@ -123,7 +123,7 @@ mkdir -p /build/isl \
 ln -s "${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB}/"libisl.so.* \
     "${CROS_HOST_PREFIX}/${CROS_TARGET}/lib"
 
-pkgname=${CLOOG_VERSION}${CC_VERSION}-chromeos-${CROS_PKG_ARCH}
+pkgname=${CLOOG_VERSION}-chromeos-${CROS_PKG_ARCH}
 mkdir -p /build/cloog \
     && cd /build/cloog \
     && LDFLAGS=${CROS_NATIVE_LDFLAGS} /src/${CLOOG_VERSION}/configure \
@@ -145,7 +145,7 @@ mkdir -p /build/cloog \
 
 // gcc
 
-pkgname=${GCC_VERSION}${CC_VERSION}-chromeos-${CROS_PKG_ARCH}
+pkgname=${GCC_VERSION}-chromeos-${CROS_PKG_ARCH}
 mkdir -p /build/gcc \
     && cd /build/gcc \
     && LDFLAGS=${CROS_NATIVE_LDFLAGS} /src/${GCC_VERSION}/configure \

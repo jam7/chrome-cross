@@ -52,7 +52,7 @@ ENV RUBY_TARGET i686-cros-linux-gnu
 ENV RUBY_TARGET x86_64-cros-linux-gnu
 #endif
 
-pkgname=${RUBY_VERSION}${CC_VERSION}-chromeos-${CROS_PKG_ARCH} \
+pkgname=${RUBY_VERSION}-chromeos-${CROS_PKG_ARCH} \
     && cd /src/${RUBY_VERSION}* \
     && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib ./configure \
         --prefix=${CROS_TARGET_PREFIX} \
