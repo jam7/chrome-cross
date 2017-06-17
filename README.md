@@ -51,7 +51,7 @@ Packages
 
 Made following packages for armv8, armv7, x86 and x64.
 
-    linuxheaders, binutils, glibc, gmp, mpfr, mpc, isl, cloog and gcc
+    linuxheaders, binutils, glibc, gmp, mpfr, mpc, isl, cloog, gcc, libssh2, git and ruby
 
 Other packages
 --------------
@@ -80,6 +80,20 @@ Cross Compiler
 If you would like to create cross compiler by your self, use following commands.
 
     make cross-armv8 | cross-armv7 | cross-x86 | cross-x64 | cross
+
+Version Hitory
+--------------
+
+|Version|Description|
+|:---:|---|
+|v1.7|Add libssh2, git and ruby|
+|v1.6|Change to use gcc-4.9.4|
+|v1.5|Change to use gcc-7.1.0|
+|v1.4|Change armv8 configuration to use armv7 configuration|
+|v1.3|Remove static libraries|
+|v1.2|Add FORTRAN|
+|v1.1|Change to use isl and cloog for gcc|
+|v1.0|First release|
 
 License
 -------
