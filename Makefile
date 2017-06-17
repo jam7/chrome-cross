@@ -14,10 +14,10 @@ TRIGGER_X64 = $(PACKAGES:%=cross-x64/%.image)
 usage:
 	@echo
 	@echo "In order to make cross compiling environment on docker, type"
-	@echo "   $$ make cross-armv7|cross-x86|cross-x64|cross"
+	@echo "   $$ make cross-armv7|cross-armv8|cross-x64|cross-x86|cross"
 	@echo
 	@echo "In order to make compiled packages for each architecture, type either"
-	@echo "   $$ make armv7|x86|x64|all"
+	@echo "   $$ make armv7|armv8|x64|x86|all"
 	@echo
 	@echo "Currently creates "'"'"${PACKAGES}"'"'" only"
 	@echo
@@ -25,7 +25,6 @@ usage:
 .SUFFIXES: .sh.in .sh .image
 
 clean:
-	rm -f packages/*.armv7.sh packages/*.x86.sh packages/*.x64.sh
 	rm -rf cross-armv7/* cross-x86/* cross-x64/* dist/*
 
 #
