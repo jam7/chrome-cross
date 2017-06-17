@@ -39,25 +39,12 @@ cd /src/readline* \
 
 // ruby
 
-#ifdef CHROMEBREW_ARMV8
-ENV RUBY_TARGET armv7l-cros-linux-gnueabihf
-#endif
-#ifdef CHROMEBREW_ARMV7
-ENV RUBY_TARGET armv7l-cros-linux-gnueabihf
-#endif
-#ifdef CHROMEBREW_X86
-ENV RUBY_TARGET i686-cros-linux-gnu
-#endif
-#ifdef CHROMEBREW_X64
-ENV RUBY_TARGET x86_64-cros-linux-gnu
-#endif
-
 pkgname=${RUBY_VERSION}-chromeos-${CROS_PKG_ARCH} \
     && cd /src/${RUBY_VERSION}* \
     && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib ./configure \
         --prefix=${CROS_TARGET_PREFIX} \
         --build=${CROS_HOST} \
-        --host=${RUBY_TARGET} \
+        --host=${CROS_TARGET} \
         --with-baseruby=ruby \
         --with-zlib-dir=${CROS_HOST_PREFIX}/${CROS_TARGET} \
         --with-readline-dir=${CROS_HOST_PREFIX}/${CROS_TARGET} \
