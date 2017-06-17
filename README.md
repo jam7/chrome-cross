@@ -19,7 +19,7 @@ Usage
 
 Make packages using cross compiler by following commands.  This may download docker images for cross comppiler.
 
-    make armv8 | armv7 | x86 | x64 | all
+    make armv7 | armv8 | x64 | x86 | all
 
 You will get toolchains under dist directory.
 
@@ -49,7 +49,7 @@ gcc-4.9.x-chromeos-x86_64.tar.xz.sha1      linux-headers-3.18-chromeos-armv7l.ta
 Packages
 --------
 
-Made following packages for armv8, armv7, x86 and x64.
+Made following packages for armv7, armv8, x64 and x86.
 
     linuxheaders, binutils, glibc, gmp, mpfr, mpc, isl, cloog, gcc, libssh2, git and ruby
 
@@ -67,10 +67,10 @@ All binary and shared libraries are compiled with appropriate -rpath options lik
 
 |chipset|uname -m|rpaths|
 |:---:|:---:|---|
-|arm64|aarch64|/usr/local/lib:/usr/local/lib64|
-|armv7l|armv7l|/usr/local/lib|
-|x86|i686|/usr/local/lib|
+|armv7|armv7l|/usr/local/lib|
+|armv8|aarch64|/usr/local/lib:/usr/local/lib64|
 |x64|x86\_64|/usr/local/lib:/usr/local/lib64|
+|x86|i686|/usr/local/lib|
 
 I'm not sure what I should do for /usr/local/lib32, so I'm currently not using it.
 
@@ -79,7 +79,7 @@ Cross Compiler
 
 If you would like to create cross compiler by your self, use following commands.
 
-    make cross-armv8 | cross-armv7 | cross-x86 | cross-x64 | cross
+    make cross-armv7 | cross-armv8 | cross-x64 | cross-x86 | cross
 
 Version Hitory
 --------------
