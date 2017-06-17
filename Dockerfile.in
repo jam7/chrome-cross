@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         texinfo \
         perl \
         gettext \
+        ruby \
     && rm -rf /var/cache/apt/archives /var/lib/apt/lists
 
 // cross
@@ -31,6 +32,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 // Following sed command at *1* is to fix undefined '__stack_chk_guard' problem on x86 and x64.
 // see http://www.linuxquestions.org/questions/linux-from-scratch-13/install-glibc-2-17-error-help-me-4175460557/ and
 // http://stackoverflow.com/questions/15787684/lfs-glibc-compilation-ld-error for mode details
+//
+// Performing 2 steps gcc compile with sys-include symlink to solve include-fixed/limits.h problem.
+// Gcc needs to have sys-include/limits.h to create correct include-fixed/limits.h.
 
 ENV PATH ${CROS_HOST_PREFIX}/bin:$PATH
 
@@ -74,15 +78,18 @@ RUN wget -q "ftp://ftp.gnu.org/gnu/gmp/${GMP_VERSION}.tar.bz2" \
     && ln -s ../${ISL_VERSION} isl \
     && ln -s ../${CLOOG_VERSION} cloog \
     && sed -i '/k prot/agcc_cv_libc_provides_ssp=yes' gcc/configure /*1*/ \
-    && gccdir="$(mktemp -d)" \
+    && ln -s include ${CROS_HOST_PREFIX}/${CROS_TARGET}/sys-include \
+    && gccdir1="$(mktemp -d)" \
+    && gccdir2="$(mktemp -d)" \
     && glibcdir="$(mktemp -d)" \
-    && cd "$gccdir" \
+    && cd "$gccdir1" \
     && /src/${GCC_VERSION}/configure \
         --prefix=${CROS_HOST_PREFIX} \
         --build=${CROS_HOST} \
         --host=${CROS_HOST} \
         --target=${CROS_TARGET} \
-        --enable-languages=c,c++,fortran \
+        --enable-languages=c \
+        --without-headers \
         --disable-staic \
         --disable-werror \
         ${CROS_CROSS_GCC_OPT} \
@@ -104,14 +111,24 @@ RUN wget -q "ftp://ftp.gnu.org/gnu/gmp/${GMP_VERSION}.tar.bz2" \
     && install csu/crt1.o csu/crti.o csu/crtn.o ${CROS_HOST_PREFIX}/${CROS_TARGET}/lib \
     && ${CROS_TARGET}-gcc -nostdlib -nostartfiles -shared -x c /dev/null -o ${CROS_HOST_PREFIX}/${CROS_TARGET}/lib/libc.so \
     && touch ${CROS_HOST_PREFIX}/${CROS_TARGET}/include/gnu/stubs.h \
-    && cd "$gccdir" \
+    && cd "$gccdir2" \
+    && /src/${GCC_VERSION}/configure \
+        --prefix=${CROS_HOST_PREFIX} \
+        --build=${CROS_HOST} \
+        --host=${CROS_HOST} \
+        --target=${CROS_TARGET} \
+        --enable-languages=c,c++,fortran \
+        --disable-staic \
+        --disable-werror \
+        ${CROS_CROSS_GCC_OPT} \
     && make -j ${CROS_CORES} all-target-libgcc && make install-target-libgcc \
     && cd "$glibcdir" \
     && make -j ${CROS_CORES} && make install \
-    && cd "$gccdir" \
+    && cd "$gccdir2" \
     && make -j ${CROS_CORES} all && make install-strip \
     && cd / \
-    && rm -rf "$gccdir" \
+    && rm -rf "$gccdir1" \
+    && rm -rf "$gccdir2" \
     && rm -rf "$glibcdir" \
     && rm -rf "/src/${GMP_VERSION}" "/src/${MPFR_VERSION}" "/src/${MPC_VERSION}" "/src/${ISL_VERSION}" "/src/${CLOOG_VERSION}" "/src/${GLIBC_VERSION}" "/src/${GCC_VERSION}"
 
