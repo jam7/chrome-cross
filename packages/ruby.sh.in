@@ -1,0 +1,68 @@
+// native compilation
+
+#include "../env.docker"
+
+// prepare sources
+
+RUBY_VERSION="ruby-2.4.1"
+
+set -x
+cd /src \
+    && wget -cq "https://cache.ruby-lang.org/pub/ruby/2.4/ruby-2.4.1.tar.xz" \
+    && tar xfp ruby-2.4.1.tar* \
+    && wget -cq "http://ftp.gnu.org/pub/gnu/ncurses/ncurses-5.9.tar.gz" \
+    && tar xfp ncurses-5.9.tar* \
+    && wget -cq "ftp://ftp.gnu.org/gnu/readline/readline-6.3.tar.gz" \
+    && tar xfp readline-6.3.tar*
+[ "$?" != "0" ] && exit 1
+
+cd /src/ncurses* \
+    && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib ./configure \
+        --prefix=${CROS_HOST_PREFIX}/${CROS_TARGET} \
+        --build=${CROS_HOST} \
+        --host=${CROS_TARGET} \
+        --with-shared \
+    && make \
+    && make install
+
+cd /src/readline* \
+    && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib ./configure \
+        --prefix=${CROS_HOST_PREFIX}/${CROS_TARGET} \
+        --build=${CROS_HOST} \
+        --host=${CROS_TARGET} \
+        --with-curses \
+    && make \
+    && make install
+
+// ruby
+
+#ifdef CHROMEBREW_ARMV8
+ENV RUBY_TARGET armv7l-cros-linux-gnueabihf
+#endif
+#ifdef CHROMEBREW_ARMV7
+ENV RUBY_TARGET armv7l-cros-linux-gnueabihf
+#endif
+#ifdef CHROMEBREW_X86
+ENV RUBY_TARGET i686-cros-linux-gnu
+#endif
+#ifdef CHROMEBREW_X64
+ENV RUBY_TARGET x86_64-cros-linux-gnu
+#endif
+
+pkgname=${RUBY_VERSION}${CC_VERSION}-chromeos-${CROS_PKG_ARCH} \
+    && cd /src/${RUBY_VERSION}* \
+    && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib ./configure \
+        --prefix=${CROS_TARGET_PREFIX} \
+        --build=${CROS_HOST} \
+        --host=${RUBY_TARGET} \
+        --with-baseruby=ruby \
+        --with-zlib=${CROS_HOST_PREFIX}/${CROS_TARGET} \
+    && make \
+    && find . -name '*.so' -print | xargs ${CROS_TARGET}-strip -S \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && ${CROS_TARGET}-strip ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_PREFIX}/bin/ruby \
+    && mv ${CROS_HOST_DEST}/${pkgname}/var/lib/gems ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_PREFIX}/lib/ruby \
+    && rm -rf ${CROS_HOST_DEST}/${pkgname}/var \
+    && cd "${CROS_HOST_DEST}/${pkgname}" \
+    && sh ../create_package.sh \
+    && rm -rf "${CROS_HOST_DEST}/${pkgname}"
