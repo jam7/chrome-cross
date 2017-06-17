@@ -16,11 +16,17 @@ cd /src \
     && tar xfp readline-6.3.tar*
 [ "$?" != "0" ] && exit 1
 
+#ifdef CHROMEBREW_ARMV8
+ENV NCURSES_TARGET arm-linux-gnueabihf
+#else
+ENV NCURSES_TARGET ${CROS_TARGET}
+#endif
+
 cd /src/ncurses* \
     && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib ./configure \
         --prefix=${CROS_HOST_PREFIX}/${CROS_TARGET} \
         --build=${CROS_HOST} \
-        --host=${CROS_TARGET} \
+        --host=${NCURSES_TARGET} \
         --with-shared \
     && make -j ${CROS_CORES} \
     && make install
