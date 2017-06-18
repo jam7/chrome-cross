@@ -12,7 +12,9 @@ PACKAGES_ARMV8 = $(TOOLCHAINS_ARMV8) $(BINARIES_ARMV8)
 PACKAGES_X64 = $(TOOLCHAINS_X64) $(BINARIES_X64)
 PACKAGES_X86 = $(TOOLCHAINS_X86) $(BINARIES_X86)
 
-TOOLCHAINS = linux-headers binutils gcc glibc
+# TOOLCHAINS are ordered belong to dependency order
+
+TOOLCHAINS = linux-headers binutils gmp mpfr mpc isl cloog gcc glibc
 TOOLCHAINS_SH_ARMV7 = $(TOOLCHAINS:%=cross-armv7/%.sh)
 TOOLCHAINS_SH_ARMV8 = $(TOOLCHAINS:%=cross-armv8/%.sh)
 TOOLCHAINS_SH_X64 = $(TOOLCHAINS:%=cross-x64/%.sh)
@@ -24,7 +26,7 @@ TOOLCHAINS_X86 = $(TOOLCHAINS:%=cross-x86/%.image)
 
 # BINARIES are ordered belong to dependency order
 
-BINARIES = zlib openssl libssh2 curl expat git ruby
+BINARIES = zlib openssl libssh2 curl expat git ncurses readline gmp ruby
 BINARIES_SH_ARMV7 = $(BINARIES:%=cross-armv7/%.sh)
 BINARIES_SH_ARMV8 = $(BINARIES:%=cross-armv8/%.sh)
 BINARIES_SH_X64 = $(BINARIES:%=cross-x64/%.sh)
