@@ -1,0 +1,28 @@
+// native compilation
+
+#include "../env.docker"
+
+ENV ZLIB_VERSION zlib-1.2.11
+
+// prepare sources
+
+set -x
+cd /src \
+    && wget -cq "http://zlib.net/${ZLIB_VERSION}.tar.xz" \
+    && tar xfp ${ZLIB_VERSION}.tar*
+[ "$?" != "0" ] && exit 1
+
+// zlib
+
+pkgname=${ZLIB_VERSION}-chromeos-${CROS_PKG_ARCH} \
+    && dir="$(mktemp -d)" \
+    && cd "$dir" \
+    && LDFLAGS=${CROS_NATIVE_LDFLAGS} CC=${CROS_TARGET}-gcc /src/${ZLIB_VERSION}/configure \
+        --prefix=${CROS_TARGET_PREFIX} \
+    && make -j ${CROS_CORES} \
+    && find . -name '*.so.*' -print | xargs ${CROS_TARGET}-strip -S \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && rm ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_PREFIX}/lib/libz.a \
+    && cd "${CROS_HOST_DEST}/${pkgname}" \
+    && sh ../create_package.sh \
+    && rm -rf "${CROS_HOST_DEST}/${pkgname}"
