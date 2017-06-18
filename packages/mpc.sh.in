@@ -1,0 +1,41 @@
+// native compilation
+
+#include "../env.docker"
+
+// prepare library sources
+
+cd /src \
+    && wget -cq "ftp://ftp.gnu.org/gnu/mpc/${MPC_VERSION}.tar.gz" \
+    && tar xpf ${MPC_VERSION}.tar*
+[ "$?" != "0" ] && exit 1
+
+// gmp and mpfr
+
+cd ${CROS_HOST_PREFIX}/${CROS_TARGET} \
+    && tar xfp /dist/gmp*${CROS_PKG_ARCH}*.tar.xz \
+    && tar xfp /dist/mpfr*${CROS_PKG_ARCH}*.tar.xz \
+    && cd ${CROS_HOST_PREFIX}/${CROS_TARGET}/lib \
+    && ln -s ${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB}/lib* .
+[ "$?" != "0" ] && exit 1
+
+// mpc
+
+pkgname=${MPC_VERSION}-chromeos-${CROS_PKG_ARCH}
+mkdir -p /build/mpc \
+    && cd /build/mpc \
+    && LDFLAGS=${CROS_NATIVE_LDFLAGS} /src/${MPC_VERSION}/configure \
+        --prefix=${CROS_TARGET_PREFIX} \
+        --libdir=${CROS_TARGET_LIB} \
+        --build=${CROS_HOST} \
+        --host=${CROS_TARGET} \
+        --disable-static \
+        --with-sysroot=${CROS_HOST_PREFIX}/${CROS_TARGET} \
+        --with-gmp-include=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX}/include \
+        --with-gmp-lib=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB} \
+        --with-mpfr-include=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX}/include \
+        --with-mpfr-lib=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB} \
+    && make -j ${CROS_CORES} \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install-strip \
+    && cd ${CROS_HOST_DEST}/${pkgname} \
+    && sh ../create_package.sh \
+    && rm -rf ${CROS_HOST_DEST}/${pkgname}

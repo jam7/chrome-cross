@@ -1,0 +1,30 @@
+// native compilation
+
+#include "../env.docker"
+
+// prepare library sources
+
+set -x
+cd /src \
+    && wget -cq "ftp://ftp.gnu.org/gnu/gmp/${GMP_VERSION}.tar.bz2" \
+    && tar xpf ${GMP_VERSION}.tar*
+[ "$?" != "0" ] && exit 1
+
+// gmp
+
+pkgname=${GMP_VERSION}-chromeos-${CROS_PKG_ARCH}
+mkdir -p /build/gmp \
+    && cd /build/gmp \
+    && LDFLAGS=${CROS_NATIVE_LDFLAGS} /src/${GMP_VERSION}/configure \
+        --prefix=${CROS_TARGET_PREFIX} \
+        --libdir=${CROS_TARGET_LIB} \
+        --build=${CROS_HOST} \
+        --host=${CROS_TARGET} \
+        --enable-cxx \
+        --disable-static \
+        --with-sysroot=${CROS_HOST_PREFIX}/${CROS_TARGET} \
+    && make -j ${CROS_CORES} \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install-strip \
+    && cd ${CROS_HOST_DEST}/${pkgname} \
+    && sh ../create_package.sh \
+    && rm -rf ${CROS_HOST_DEST}/${pkgname}
