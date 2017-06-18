@@ -1,0 +1,51 @@
+// native compilation
+
+#include "../env.docker"
+
+// prepare sources
+
+READLINE_TAR_VERSION="readline-6.3"
+READLINE_VERSION="readline-6.3p8"
+
+set -x
+cd /src \
+    && wget -cq "ftp://ftp.gnu.org/gnu/readline/${READLINE_TAR_VERSION}.tar.gz" \
+    && tar xfp ${READLINE_TAR_VERSION}.tar* \
+    && cd ${READLINE_TAR_VERSION} \
+    && wget -q "ftp://ftp.gnu.org/gnu/readline/readline-6.3-patches/readline63-001" -P patches \
+    && wget -q "ftp://ftp.gnu.org/gnu/readline/readline-6.3-patches/readline63-002" -P patches \
+    && wget -q "ftp://ftp.gnu.org/gnu/readline/readline-6.3-patches/readline63-003" -P patches \
+    && wget -q "ftp://ftp.gnu.org/gnu/readline/readline-6.3-patches/readline63-004" -P patches \
+    && wget -q "ftp://ftp.gnu.org/gnu/readline/readline-6.3-patches/readline63-005" -P patches \
+    && wget -q "ftp://ftp.gnu.org/gnu/readline/readline-6.3-patches/readline63-006" -P patches \
+    && wget -q "ftp://ftp.gnu.org/gnu/readline/readline-6.3-patches/readline63-007" -P patches \
+    && wget -q "ftp://ftp.gnu.org/gnu/readline/readline-6.3-patches/readline63-008" -P patches \
+    && for i in patches/readline63-???; do patch < $i; done
+[ "$?" != "0" ] && exit 1
+
+// ncurses
+
+cd ${CROS_HOST_PREFIX}/${CROS_TARGET} \
+    && tar xfp /dist/ncurses*${CROS_PKG_ARCH}*.tar.xz \
+    && cd ${CROS_HOST_PREFIX}/${CROS_TARGET}/lib \
+    && ln -s ${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB}/lib* .
+[ "$?" != "0" ] && exit 1
+
+// readline
+
+pkgname=${READLINE_VERSION}-chromeos-${CROS_PKG_ARCH}
+cd /src/${READLINE_TAR_VERSION} \
+    && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib ./configure \
+        bash_cv_wcwidth_broken=no \
+        --prefix=${CROS_TARGET_PREFIX} \
+        --libdir=${CROS_TARGET_LIB} \
+        --build=${CROS_HOST} \
+        --host=${CROS_TARGET} \
+        --disable-static \
+        --with-curses \
+    && make -j ${CROS_CORES} \
+    && find . -name '*.so.*' -print | xargs ${CROS_TARGET}-strip -S \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && cd ${CROS_HOST_DEST}/${pkgname} \
+    && sh ../create_package.sh \
+    && rm -rf ${CROS_HOST_DEST}/${pkgname}

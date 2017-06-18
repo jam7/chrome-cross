@@ -8,51 +8,20 @@ RUBY_VERSION="ruby-2.4.1"
 
 set -x
 cd /src \
-    && wget -cq "https://cache.ruby-lang.org/pub/ruby/2.4/ruby-2.4.1.tar.xz" \
-    && tar xfp ruby-2.4.1.tar* \
-    && wget -cq "http://ftp.gnu.org/pub/gnu/ncurses/ncurses-5.9.tar.gz" \
-    && tar xfp ncurses-5.9.tar* \
-    && wget -cq "ftp://ftp.gnu.org/gnu/readline/readline-6.3.tar.gz" \
-    && tar xfp readline-6.3.tar*
+    && wget -cq "https://cache.ruby-lang.org/pub/ruby/2.4/${RUBY_VERSION}.tar.xz" \
+    && tar xfp ${RUBY_VERSION}.tar*
 [ "$?" != "0" ] && exit 1
 
-// zlib, openssl and gmp
+// zlib, openssl, gmp, ncurses and readline
 
 cd ${CROS_HOST_PREFIX}/${CROS_TARGET} \
     && tar xfp /dist/zlib*${CROS_PKG_ARCH}*.tar.xz \
     && tar xfp /dist/openssl*${CROS_PKG_ARCH}*.tar.xz \
     && tar xfp /dist/gmp*${CROS_PKG_ARCH}*.tar.xz \
+    && tar xfp /dist/ncurses*${CROS_PKG_ARCH}*.tar.xz \
+    && tar xfp /dist/readline*${CROS_PKG_ARCH}*.tar.xz \
     && cd ${CROS_HOST_PREFIX}/${CROS_TARGET}/lib \
     && ln -s ${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB}/lib* .
-[ "$?" != "0" ] && exit 1
-
-// ncurses and readline
-
-#ifdef CHROMEBREW_ARMV8
-ENV NCURSES_TARGET arm-linux-gnueabihf
-#else
-ENV NCURSES_TARGET ${CROS_TARGET}
-#endif
-
-cd /src/ncurses* \
-    && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib ./configure \
-        --prefix=${CROS_HOST_PREFIX}/${CROS_TARGET} \
-        --build=${CROS_HOST} \
-        --host=${NCURSES_TARGET} \
-        --with-shared \
-    && make -j ${CROS_CORES} \
-    && make install
-[ "$?" != "0" ] && exit 1
-
-cd /src/readline* \
-    && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib ./configure \
-        bash_cv_wcwidth_broken=no \
-        --prefix=${CROS_HOST_PREFIX}/${CROS_TARGET} \
-        --build=${CROS_HOST} \
-        --host=${CROS_TARGET} \
-        --with-curses \
-    && make -j ${CROS_CORES} \
-    && make install
 [ "$?" != "0" ] && exit 1
 
 // ruby
@@ -66,7 +35,7 @@ pkgname=${RUBY_VERSION}-chromeos-${CROS_PKG_ARCH} \
         --with-baseruby=ruby \
         --with-openssl-dir=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
         --with-zlib-dir=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
-        --with-readline-dir=${CROS_HOST_PREFIX}/${CROS_TARGET} \
+        --with-readline-dir=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
     && make -j ${CROS_CORES} \
     && find . -name '*.so' -print | xargs ${CROS_TARGET}-strip -S \
     && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \

@@ -1,0 +1,46 @@
+// native compilation
+
+#include "../env.docker"
+
+// prepare sources
+
+NCURSES_VERSION="ncurses-5.9"
+
+set -x
+cd /src \
+    && wget -cq "http://ftp.gnu.org/pub/gnu/ncurses/${NCURSES_VERSION}.tar.gz" \
+    && tar xfp ${NCURSES_VERSION}.tar*
+[ "$?" != "0" ] && exit 1
+
+// ncurses
+
+#ifdef CHROMEBREW_ARMV8
+ENV NCURSES_TARGET arm-linux-gnueabihf
+#else
+ENV NCURSES_TARGET ${CROS_TARGET}
+#endif
+
+pkgname=${NCURSES_VERSION}-chromeos-${CROS_PKG_ARCH}
+cd /src/${NCURSES_VERSION} \
+    && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib ./configure \
+        --prefix=${CROS_TARGET_PREFIX} \
+        --libdir=${CROS_TARGET_LIB} \
+        --build=${CROS_HOST} \
+        --host=${NCURSES_TARGET} \
+        --without-normal \
+        --without-debug \
+        --with-shared \
+        --with-cxx-shared \
+    && make -j ${CROS_CORES} \
+    && find . -name '*.so.*' -print | xargs ${CROS_TARGET}-strip -S \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && ${CROS_TARGET}-strip ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_PREFIX}/bin/clear \
+    && ${CROS_TARGET}-strip ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_PREFIX}/bin/infocmp \
+    && ${CROS_TARGET}-strip ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_PREFIX}/bin/tabs \
+    && ${CROS_TARGET}-strip ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_PREFIX}/bin/tic \
+    && ${CROS_TARGET}-strip ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_PREFIX}/bin/tput \
+    && ${CROS_TARGET}-strip ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_PREFIX}/bin/tset \
+    && ${CROS_TARGET}-strip ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_PREFIX}/bin/toe \
+    && cd ${CROS_HOST_DEST}/${pkgname} \
+    && sh ../create_package.sh \
+    && rm -rf ${CROS_HOST_DEST}/${pkgname}
