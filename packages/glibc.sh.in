@@ -5,8 +5,8 @@
 // glibc
 
 cd /src \
-    && wget -q "ftp://ftp.gnu.org/gnu/glibc/${GLIBC_VERSION}.tar.gz" \
-    && tar xfk ${GLIBC_VERSION}.tar.gz \
+    && wget -cq "ftp://ftp.gnu.org/gnu/glibc/${GLIBC_VERSION}.tar.gz" \
+    && tar xfp ${GLIBC_VERSION}.tar.gz \
     && rm -rf ${GLIBC_VERSION}.tar.gz
 [ "$?" != "0" ] && exit 1
 

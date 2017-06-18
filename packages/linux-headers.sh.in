@@ -5,8 +5,8 @@
 // linux-headers
 
 cd /src \
-    && wget -q "https://www.kernel.org/pub/linux/kernel/v3.x/${LINUX_VERSION}.tar.xz" \
-    && tar xfk ${LINUX_VERSION}.tar.xz \
+    && wget -cq "https://www.kernel.org/pub/linux/kernel/v3.x/${LINUX_VERSION}.tar.xz" \
+    && tar xpf ${LINUX_VERSION}.tar.xz \
     && rm ${LINUX_VERSION}.tar.xz
 [ "$?" != "0" ] && exit 1
 
