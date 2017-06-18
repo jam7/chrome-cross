@@ -16,6 +16,13 @@ cd /src \
     && tar xfp readline-6.3.tar*
 [ "$?" != "0" ] && exit 1
 
+// zlib
+
+cd ${CROS_HOST_PREFIX}/${CROS_TARGET} \
+    && tar xfp /dist/zlib*${CROS_PKG_ARCH}*.tar.xz
+
+// ncurses and readline
+
 #ifdef CHROMEBREW_ARMV8
 ENV NCURSES_TARGET arm-linux-gnueabihf
 #else
@@ -52,7 +59,7 @@ pkgname=${RUBY_VERSION}-chromeos-${CROS_PKG_ARCH} \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
         --with-baseruby=ruby \
-        --with-zlib-dir=${CROS_HOST_PREFIX}/${CROS_TARGET} \
+        --with-zlib-dir=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
         --with-readline-dir=${CROS_HOST_PREFIX}/${CROS_TARGET} \
     && make -j ${CROS_CORES} \
     && find . -name '*.so' -print | xargs ${CROS_TARGET}-strip -S \
