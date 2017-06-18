@@ -186,6 +186,12 @@ dockertag:
 	docker tag $(ORG)/cross-x64 $(ORG)/cross-x64:$(VERSION)
 	docker tag $(ORG)/cross-x86 $(ORG)/cross-x86:$(VERSION)
 
+dockerpush:
+	docker push $(ORG)/cross-armv7
+	docker push $(ORG)/cross-armv8
+	docker push $(ORG)/cross-x64
+	docker push $(ORG)/cross-x86
+
 
 FORCE:
 .PHONY: all clean FORCE armv7 armv8 x64 x86 armv7-toolchains armv8-toolchains x64-toolchains x86-toolchains armv7-binaries armv8-binaries x64-binaries x86-binaries cross
