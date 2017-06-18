@@ -4,27 +4,40 @@
 
 // prepare sources
 
+GIT_TARFILE="v2.13.0.tar.gz"
 GIT_VERSION="git-2.13.0"
 
 set -x
 cd /src \
-    && wget -cq "https://github.com/git/git/archive/v2.13.0.tar.gz" \
-    && tar xfk *.tar*
+    && wget -cq "https://github.com/git/git/archive/${GIT_TARFILE}" \
+    && tar xpf ${GIT_TARFILE}
 [ "$?" != "0" ] && exit 1
 
-// binutils
+// zlib, openssl,libssh2 and curl
+
+cd ${CROS_HOST_PREFIX}/${CROS_TARGET} \
+    && tar xfp /dist/zlib*${CROS_PKG_ARCH}*.tar.xz \
+    && tar xfp /dist/openssl*${CROS_PKG_ARCH}*.tar.xz \
+    && tar xfp /dist/libssh2*${CROS_PKG_ARCH}*.tar.xz \
+    && tar xfp /dist/curl*${CROS_PKG_ARCH}*.tar.xz
+
+// git
 
 pkgname=${GIT_VERSION}-chromeos-${CROS_PKG_ARCH} \
     && cd /src/${GIT_VERSION}* \
     && make configure \
-    && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib ./configure \
+    && LIBS="-lssh2 -lssl -lcrypto -lz" LDFLAGS=${CROS_NATIVE_LDFLAGS} ./configure \
         ac_cv_fread_reads_directories=no \
         ac_cv_snprintf_returns_bogus=no \
         --prefix=${CROS_TARGET_PREFIX} \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
-        --with-zlib=${CROS_HOST_PREFIX}/${CROS_TARGET} \
+        --with-zlib=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
+        --with-openssl=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
+        --with-ssh=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
+        --with-curl=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
         --without-tcltk \
+    && sed -e '$aEXTLIBS += -lssh2 -lssl -lcrypto -lz' -i config.mak.autogen \
     && make all \
     && STRIP=${CROS_TARGET}-strip make strip \
     && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
