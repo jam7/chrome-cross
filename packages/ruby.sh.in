@@ -16,11 +16,12 @@ cd /src \
     && tar xfp readline-6.3.tar*
 [ "$?" != "0" ] && exit 1
 
-// zlib
+// zlib, openssl and gmp
 
 cd ${CROS_HOST_PREFIX}/${CROS_TARGET} \
     && tar xfp /dist/zlib*${CROS_PKG_ARCH}*.tar.xz \
     && tar xfp /dist/openssl*${CROS_PKG_ARCH}*.tar.xz \
+    && tar xfp /dist/gmp*${CROS_PKG_ARCH}*.tar.xz \
     && cd ${CROS_HOST_PREFIX}/${CROS_TARGET}/lib \
     && ln -s ${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB}/lib* .
 [ "$?" != "0" ] && exit 1
