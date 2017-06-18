@@ -14,7 +14,7 @@ PACKAGES_X86 = $(TOOLCHAINS_X86) $(BINARIES_X86)
 
 # TOOLCHAINS are ordered belong to dependency order
 
-TOOLCHAINS = linux-headers binutils gmp mpfr mpc isl cloog gcc glibc
+TOOLCHAINS = linux-headers binutils gmp mpfr mpc isl cloog gcc glibc glibc219
 TOOLCHAINS_SH_ARMV7 = $(TOOLCHAINS:%=cross-armv7/%.sh)
 TOOLCHAINS_SH_ARMV8 = $(TOOLCHAINS:%=cross-armv8/%.sh)
 TOOLCHAINS_SH_X64 = $(TOOLCHAINS:%=cross-x64/%.sh)

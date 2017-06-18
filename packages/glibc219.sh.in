@@ -1,0 +1,182 @@
+// native compilation
+
+#include "../env.docker"
+
+// glibc
+
+ENV GLIBC_VERSION glibc-2.19
+
+cd /src \
+    && wget -cq "ftp://ftp.gnu.org/gnu/glibc/${GLIBC_VERSION}.tar.gz" \
+    && tar xfp ${GLIBC_VERSION}.tar.gz \
+    && rm -rf ${GLIBC_VERSION}.tar.gz
+[ "$?" != "0" ] && exit 1
+
+pkgname=${GLIBC_VERSION}-chromeos-${CROS_PKG_ARCH}
+
+// specify library directory
+
+#ifdef CHROMEBREW_ARMV8
+#define USE_LIB64
+#endif
+#ifdef CHROMEBREW_ARMV7
+#define USE_LIB
+#endif
+#ifdef CHROMEBREW_X86
+#define USE_LIB
+#endif
+#ifdef CHROMEBREW_X64
+#define USE_LIB64
+#endif
+
+#ifdef USE_LIB
+LOCALLIB=lib
+LIB=lib
+mkdir -p /build/glibc \
+    && cd /build/glibc \
+    && LDFLAGS="-Wl,-rpath,${CROS_TARGET_LIB}" /src/${GLIBC_VERSION}/configure \
+        --prefix=${CROS_TARGET_PREFIX} \
+        --build=${CROS_HOST} \
+        --host=${CROS_TARGET} \
+        --target=${CROS_TARGET} \
+        ${CROS_NATIVE_LIBC_OPT} \
+        --enable-shared \
+        --disable-sanity-checks \
+        --disable-static \
+        --disable-werror \
+    && make -j ${CROS_CORES} \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install
+#endif
+#ifdef USE_LIB64
+LOCALLIB=lib64
+LIB=lib64
+// need special treatment to place library files in lib64
+mkdir -p /build/glibc \
+    && cd /build/glibc \
+    && echo "slibdir=${CROS_TARGET_PREFIX}/lib64" > configparms \
+    && LDFLAGS="-Wl,-rpath,${CROS_TARGET_LIB}" /src/${GLIBC_VERSION}/configure \
+        --prefix=${CROS_TARGET_PREFIX} \
+        --libdir=${CROS_TARGET_PREFIX}/lib64 \
+        --build=${CROS_HOST} \
+        --host=${CROS_TARGET} \
+        --target=${CROS_TARGET} \
+        ${CROS_NATIVE_LIBC_OPT} \
+        --enable-shared \
+        --disable-sanity-checks \
+        --disable-static \
+        --disable-werror \
+    && make -j ${CROS_CORES} \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install
+#endif
+
+[ "$?" != "0" ] && exit 1
+
+// adjust libraries alived already in system
+
+cd ${CROS_HOST_DEST}/${pkgname}
+
+// remove particular static libraries
+rm usr/local/${LOCALLIB}/libc.a
+rm usr/local/${LOCALLIB}/libBrokenLocale.a
+rm usr/local/${LOCALLIB}/libpthread.a
+rm usr/local/${LOCALLIB}/libmvec.a
+
+// strip debug symbol of all files under lib
+find usr/local/${LOCALLIB}/ -type f | xargs ${CROS_HOST_PREFIX}/${CROS_TARGET}/bin/strip -S
+
+#ifdef CHROMEBREW_ARMV8
+rm usr/local/${LOCALLIB}/ld-linux-armhf.so.3
+ln -s /${LIB}/ld-linux-armhf.so.3 usr/local/${LOCALLIB}/ld-linux-armhf.so.3
+#endif
+#ifdef CHROMEBREW_ARMV7
+rm usr/local/${LOCALLIB}/ld-linux-armhf.so.3
+ln -s /${LIB}/ld-linux-armhf.so.3 usr/local/${LOCALLIB}/ld-linux-armhf.so.3
+#endif
+#ifdef CHROMEBREW_X86
+rm usr/local/${LOCALLIB}/ld-linux.so.2
+ln -s /${LIB}/ld-linux.so.2 usr/local/${LOCALLIB}/ld-linux.so.2
+#endif
+#ifdef CHROMEBREW_X64
+rm usr/local/${LOCALLIB}/ld-linux-x86-64.so.2
+ln -s /${LIB}/ld-linux-x86-64.so.2 usr/local/${LOCALLIB}/ld-linux-x86-64.so.2
+#endif
+
+// libc.so and libpthread.so are ld script, so need to maintain symbolic links
+rm usr/local/${LOCALLIB}/libc-*.so
+rm usr/local/${LOCALLIB}/libc.so.6
+ln -s /${LIB}/libc.so.6  usr/local/${LOCALLIB}/libc.so.6
+rm usr/local/${LOCALLIB}/libpthread-*.so
+rm usr/local/${LOCALLIB}/libpthread.so.0
+ln -s /${LIB}/libpthread.so.0 usr/local/${LOCALLIB}/libpthread.so.0
+
+// libm.so may be ld script also (depends on architecture and version)
+if grep 'GNU ld script' usr/local/${LOCALLIB}/libm.so > /dev/null; then
+  rm usr/local/${LOCALLIB}/libm-*.so
+  rm usr/local/${LOCALLIB}/libm.so.6
+  ln -s /${LIB}/libm.so.6  usr/local/${LOCALLIB}/libm.so.6
+  rm usr/local/${LOCALLIB}/libmvec-*.so
+  rm usr/local/${LOCALLIB}/libmvec.so*
+  ln -s /${LIB}/libmvec.so.1  usr/local/${LOCALLIB}/libmvec.so.1
+else
+  rm usr/local/${LOCALLIB}/libm[.-]*
+fi
+
+// Remove other libraries already existed in system
+
+// libraries not existed in system although those might be existed previously
+#define NO_BROKENLOCALE                 // no libBrokenLocale in system, so leave it as is
+#define NO_MEMUSAGE                     // no libmemusage in system, so leave it as is
+#define NO_PCPROFILE                    // no libpcprofile in system, so leave it as is
+#define NO_SEGFAULT                     // no libSegFault in system, so leave it as is
+
+// remove all libnss* even if some of them are not in system
+#if 0
+#define NO_NSSCOMPAT                    // no libnss_compat in system, so leave it as is
+#define NO_NSSDB                        // no libnss_db in system, so leave it as is
+#define NO_NSSHESIOD                    // no libnss_hesiod in system, so leave it as is
+#define NO_NSSNISPLUS                   // no libnss_nisplus in system, so leave it as is
+#define NO_NSSNIS                       // no libnss_nis in system, so leave it as is
+#endif
+
+rm usr/local/${LOCALLIB}/libanl[.-]*
+#ifndef NO_BROKENLOCALE
+rm usr/local/${LOCALLIB}/libBrokenLocale[.-]*
+#endif
+rm usr/local/${LOCALLIB}/libcidn[.-]*
+rm usr/local/${LOCALLIB}/libcrypt[.-]*
+rm usr/local/${LOCALLIB}/libdl[.-]*
+#ifndef NO_MEMUSAGE
+rm usr/local/${LOCALLIB}/libmemusage[.-]*
+#endif
+rm usr/local/${LOCALLIB}/libnsl[.-]*
+#ifndef NO_NSSCOMPAT
+rm usr/local/${LOCALLIB}/libnss_compat[.-]*
+#endif
+#ifndef NO_NSSDB
+rm usr/local/${LOCALLIB}/libnss_db[.-]*
+#endif
+rm usr/local/${LOCALLIB}/libnss_dns[.-]*
+rm usr/local/${LOCALLIB}/libnss_files[.-]*
+#ifndef NO_NSSHESIOD
+rm usr/local/${LOCALLIB}/libnss_hesiod[.-]*
+#endif
+#ifndef NO_NSSNISPLUS
+rm usr/local/${LOCALLIB}/libnss_nisplus[.-]*
+#endif
+#ifndef NO_NSSNIS
+rm usr/local/${LOCALLIB}/libnss_nis[.-]*
+#endif
+#ifndef NO_PCPROFILE
+rm usr/local/${LOCALLIB}/libpcprofile[.-]*
+#endif
+rm usr/local/${LOCALLIB}/libresolv[.-]*
+rm usr/local/${LOCALLIB}/librt[.-]*
+#ifndef NO_SEGFAULT
+rm usr/local/${LOCALLIB}/libSegFault[.-]*
+#endif
+rm usr/local/${LOCALLIB}/libthread_db[.-]*
+rm usr/local/${LOCALLIB}/libutil[.-]*
+
+cd ${CROS_HOST_DEST}/${pkgname} \
+    && sh ../create_package.sh \
+    && rm -rf ${CROS_HOST_DEST}/${pkgname}
