@@ -19,7 +19,11 @@ cd /src \
 // zlib
 
 cd ${CROS_HOST_PREFIX}/${CROS_TARGET} \
-    && tar xfp /dist/zlib*${CROS_PKG_ARCH}*.tar.xz
+    && tar xfp /dist/zlib*${CROS_PKG_ARCH}*.tar.xz \
+    && tar xfp /dist/openssl*${CROS_PKG_ARCH}*.tar.xz \
+    && cd ${CROS_HOST_PREFIX}/${CROS_TARGET}/lib \
+    && ln -s ${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB}/lib* .
+[ "$?" != "0" ] && exit 1
 
 // ncurses and readline
 
@@ -59,6 +63,7 @@ pkgname=${RUBY_VERSION}-chromeos-${CROS_PKG_ARCH} \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
         --with-baseruby=ruby \
+        --with-openssl-dir=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
         --with-zlib-dir=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
         --with-readline-dir=${CROS_HOST_PREFIX}/${CROS_TARGET} \
     && make -j ${CROS_CORES} \

@@ -17,14 +17,18 @@ cd /src \
 cd ${CROS_HOST_PREFIX}/${CROS_TARGET} \
     && tar xfp /dist/zlib*${CROS_PKG_ARCH}*.tar.xz \
     && tar xfp /dist/openssl*${CROS_PKG_ARCH}*.tar.xz \
-    && tar xfp /dist/libssh2*${CROS_PKG_ARCH}*.tar.xz
+    && tar xfp /dist/libssh2*${CROS_PKG_ARCH}*.tar.xz \
+    && cd ${CROS_HOST_PREFIX}/${CROS_TARGET}/lib \
+    && ln -s ${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB}/lib* .
+[ "$?" != "0" ] && exit 1
 
 // curl
 
 pkgname=${CURL_VERSION}-chromeos-${CROS_PKG_ARCH}
 cd /src/${CURL_VERSION} \
-    && LIBS="-lssh2 -lssl -lcrypto -lz" LDFLAGS=${CROS_NATIVE_LDFLAGS} ./configure \
+    && LDFLAGS=${CROS_NATIVE_LDFLAGS} ./configure \
         --prefix=${CROS_TARGET_PREFIX} \
+        --libdir=${CROS_TARGET_LIB} \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
         --target=${CROS_TARGET} \
@@ -34,7 +38,7 @@ cd /src/${CURL_VERSION} \
         --disable-static \
     && make -j ${CROS_CORES} \
     && find . -name '*.so.*' -print | xargs ${CROS_TARGET}-strip -S \
-    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} STRIP=${CROS_TARGET}-strip install-strip \
     && cd ${CROS_HOST_DEST}/${pkgname} \
     && sh ../create_package.sh \
     && rm -rf ${CROS_HOST_DEST}/${pkgname}

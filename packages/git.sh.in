@@ -19,14 +19,17 @@ cd ${CROS_HOST_PREFIX}/${CROS_TARGET} \
     && tar xfp /dist/zlib*${CROS_PKG_ARCH}*.tar.xz \
     && tar xfp /dist/openssl*${CROS_PKG_ARCH}*.tar.xz \
     && tar xfp /dist/libssh2*${CROS_PKG_ARCH}*.tar.xz \
-    && tar xfp /dist/curl*${CROS_PKG_ARCH}*.tar.xz
+    && tar xfp /dist/curl*${CROS_PKG_ARCH}*.tar.xz \
+    && cd ${CROS_HOST_PREFIX}/${CROS_TARGET}/lib \
+    && ln -s ${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB}/lib* .
+[ "$?" != "0" ] && exit 1
 
 // git
 
 pkgname=${GIT_VERSION}-chromeos-${CROS_PKG_ARCH} \
     && cd /src/${GIT_VERSION}* \
     && make configure \
-    && LIBS="-lssh2 -lssl -lcrypto -lz" LDFLAGS=${CROS_NATIVE_LDFLAGS} ./configure \
+    && LDFLAGS=${CROS_NATIVE_LDFLAGS} ./configure \
         ac_cv_fread_reads_directories=no \
         ac_cv_snprintf_returns_bogus=no \
         --prefix=${CROS_TARGET_PREFIX} \
@@ -34,10 +37,8 @@ pkgname=${GIT_VERSION}-chromeos-${CROS_PKG_ARCH} \
         --host=${CROS_TARGET} \
         --with-zlib=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
         --with-openssl=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
-        --with-ssh=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
         --with-curl=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
         --without-tcltk \
-    && sed -e '$aEXTLIBS += -lssh2 -lssl -lcrypto -lz' -i config.mak.autogen \
     && make all \
     && STRIP=${CROS_TARGET}-strip make strip \
     && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
