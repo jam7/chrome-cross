@@ -16,14 +16,18 @@ cd /src \
 
 cd ${CROS_HOST_PREFIX}/${CROS_TARGET} \
     && tar xfp /dist/zlib*${CROS_PKG_ARCH}*.tar.xz \
-    && tar xfp /dist/openssl*${CROS_PKG_ARCH}*.tar.xz
+    && tar xfp /dist/openssl*${CROS_PKG_ARCH}*.tar.xz \
+    && cd ${CROS_HOST_PREFIX}/${CROS_TARGET}/lib \
+    && ln -s ${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB}/lib* .
+[ "$?" != "0" ] && exit 1
 
-// binutils
+// libssh2
 
-pkgname=${LIBSSH2_VERSION}-chromeos-${CROS_PKG_ARCH} \
-    && cd /src/${LIBSSH2_VERSION} \
-    && LDFLAGS=${CROS_NATIVE_LDFLAGS} LIBS="-lssl -lcrypto -lz" ./configure \
+pkgname=${LIBSSH2_VERSION}-chromeos-${CROS_PKG_ARCH}
+cd /src/${LIBSSH2_VERSION} \
+    && LDFLAGS=${CROS_NATIVE_LDFLAGS} ./configure \
         --prefix=${CROS_TARGET_PREFIX} \
+        --libdir=${CROS_TARGET_LIB} \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
         --with-libz-prefix=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \

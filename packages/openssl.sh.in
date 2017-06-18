@@ -22,31 +22,36 @@ cd ${CROS_HOST_PREFIX}/${CROS_TARGET} \
 
 #ifdef CHROMEBREW_ARMV8
 ENV OPENSSL_TARGET "linux-armv4 -Wa,--noexecstack -march=armv8-a no-asm"
+ENV OPENSSL_LIBDIR lib64
 #endif
 #ifdef CHROMEBREW_ARMV7
 ENV OPENSSL_TARGET "linux-armv4 -Wa,--noexecstack -march=armv7-a"
+ENV OPENSSL_LIBDIR lib
 #endif
 #ifdef CHROMEBREW_X86
 ENV OPENSSL_TARGET "linux-elf -Wa,--noexecstack"
+ENV OPENSSL_LIBDIR lib
 #endif
 #ifdef CHROMEBREW_X64
 ENV OPENSSL_TARGET "linux-x86_64 -Wa,--noexecstack"
+ENV OPENSSL_LIBDIR lib64
 #endif
 
 pkgname=${OPENSSL_VERSION}-chromeos-${CROS_PKG_ARCH} \
     && cd /src/openssl* \
-    && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib \
-        LDFLAGS=${CROS_NATIVE_LDFLAGS} ./Configure \
+    && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib ./Configure \
         --prefix=${CROS_TARGET_PREFIX} \
         --openssldir=/etc/ssl \
+        --libdir=${OPENSSL_LIBDIR} \
         shared zlib-dynamic ${OPENSSL_TARGET} \
-        -I${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX}/include \
+        -I${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX}/include ${CROS_NATIVE_LDFLAGS} \
     && make -j ${CROS_CORES} \
     && find . -name '*.so' -print | xargs ${CROS_TARGET}-strip -S \
     && find . -name '*.so.*' -print | xargs ${CROS_TARGET}-strip -S \
     && make INSTALL_PREFIX=${CROS_HOST_DEST}/${pkgname} install \
     && mv ${CROS_HOST_DEST}/${pkgname}/etc/ssl/man ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_PREFIX} \
     && rm -rf ${CROS_HOST_DEST}/${pkgname}/etc \
+    && ${CROS_TARGET}-strip ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_PREFIX}/bin/openssl \
     && cd "${CROS_HOST_DEST}/${pkgname}" \
     && sh ../create_package.sh \
     && rm -rf "${CROS_HOST_DEST}/${pkgname}"

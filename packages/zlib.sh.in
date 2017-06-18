@@ -14,15 +14,14 @@ cd /src \
 
 // zlib
 
-pkgname=${ZLIB_VERSION}-chromeos-${CROS_PKG_ARCH} \
-    && dir="$(mktemp -d)" \
-    && cd "$dir" \
-    && LDFLAGS=${CROS_NATIVE_LDFLAGS} CC=${CROS_TARGET}-gcc /src/${ZLIB_VERSION}/configure \
-        --prefix=${CROS_TARGET_PREFIX} \
+pkgname=${ZLIB_VERSION}-chromeos-${CROS_PKG_ARCH}
+cd /src/${ZLIB_VERSION} \
+    && LDFLAGS=${CROS_NATIVE_LDFLAGS} CC=${CROS_TARGET}-gcc ./configure \
+        --prefix=${CROS_TARGET_PREFIX} --libdir=${CROS_TARGET_LIB} \
     && make -j ${CROS_CORES} \
     && find . -name '*.so.*' -print | xargs ${CROS_TARGET}-strip -S \
     && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
-    && rm ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_PREFIX}/lib/libz.a \
+    && rm ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_LIB}/libz.a \
     && cd "${CROS_HOST_DEST}/${pkgname}" \
     && sh ../create_package.sh \
     && rm -rf "${CROS_HOST_DEST}/${pkgname}"
