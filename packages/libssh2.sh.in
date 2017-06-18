@@ -8,20 +8,26 @@ LIBSSH2_VERSION="libssh2-1.8.0"
 
 set -x
 cd /src \
-    && wget -cq "https://www.libssh2.org/download/libssh2-1.8.0.tar.gz" \
-    && tar xfk *.tar*
+    && wget -cq "https://www.libssh2.org/download/${LIBSSH2_VERSION}.tar.gz" \
+    && tar xpf ${LIBSSH2_VERSION}.tar*
 [ "$?" != "0" ] && exit 1
+
+// zlib and openssl
+
+cd ${CROS_HOST_PREFIX}/${CROS_TARGET} \
+    && tar xfp /dist/zlib*${CROS_PKG_ARCH}*.tar.xz \
+    && tar xfp /dist/openssl*${CROS_PKG_ARCH}*.tar.xz
 
 // binutils
 
 pkgname=${LIBSSH2_VERSION}-chromeos-${CROS_PKG_ARCH} \
     && cd /src/${LIBSSH2_VERSION} \
-    && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib ./configure \
+    && LDFLAGS=${CROS_NATIVE_LDFLAGS} LIBS="-lssl -lcrypto -lz" ./configure \
         --prefix=${CROS_TARGET_PREFIX} \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
-        --with-libz-prefix=${CROS_HOST_PREFIX}/${CROS_TARGET} \
-        --with-libssl-prefix=${CROS_HOST_PREFIX}/${CROS_TARGET} \
+        --with-libz-prefix=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
+        --with-libssl-prefix=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
         --disable-static \
     && make -j ${CROS_CORES} \
     && find . -name '*.so.*' -print | xargs ${CROS_TARGET}-strip -S \
