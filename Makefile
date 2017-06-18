@@ -24,7 +24,7 @@ TOOLCHAINS_X86 = $(TOOLCHAINS:%=cross-x86/%.image)
 
 # BINARIES are ordered belong to dependency order
 
-BINARIES = zlib openssl libssh2 curl git ruby
+BINARIES = zlib openssl libssh2 curl expat git ruby
 BINARIES_SH_ARMV7 = $(BINARIES:%=cross-armv7/%.sh)
 BINARIES_SH_ARMV8 = $(BINARIES:%=cross-armv8/%.sh)
 BINARIES_SH_X64 = $(BINARIES:%=cross-x64/%.sh)

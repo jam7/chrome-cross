@@ -13,13 +13,14 @@ cd /src \
     && tar xpf ${GIT_TARFILE}
 [ "$?" != "0" ] && exit 1
 
-// zlib, openssl,libssh2 and curl
+// zlib, openssl,libssh2, curl and expat
 
 cd ${CROS_HOST_PREFIX}/${CROS_TARGET} \
     && tar xfp /dist/zlib*${CROS_PKG_ARCH}*.tar.xz \
     && tar xfp /dist/openssl*${CROS_PKG_ARCH}*.tar.xz \
     && tar xfp /dist/libssh2*${CROS_PKG_ARCH}*.tar.xz \
     && tar xfp /dist/curl*${CROS_PKG_ARCH}*.tar.xz \
+    && tar xfp /dist/expat*${CROS_PKG_ARCH}*.tar.xz \
     && cd ${CROS_HOST_PREFIX}/${CROS_TARGET}/lib \
     && ln -s ${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB}/lib* .
 [ "$?" != "0" ] && exit 1
@@ -38,6 +39,7 @@ pkgname=${GIT_VERSION}-chromeos-${CROS_PKG_ARCH} \
         --with-zlib=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
         --with-openssl=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
         --with-curl=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
+        --with-expat=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
         --without-tcltk \
     && make all \
     && STRIP=${CROS_TARGET}-strip make strip \

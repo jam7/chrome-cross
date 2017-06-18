@@ -1,0 +1,39 @@
+// native compilation
+
+#include "../env.docker"
+
+// prepare sources
+
+EXPAT_TARFILE="R_2_2_1.tar.gz"
+EXPAT_VERSION="expat-2.2.1"
+
+set -x
+cd /src \
+    && wget -cq "https://github.com/libexpat/libexpat/archive/${EXPAT_TARFILE}" \
+    && tar xpf ${EXPAT_TARFILE}
+[ "$?" != "0" ] && exit 1
+
+// docbook2x-man
+
+apt-get update && apt-get install -y --no-install-recommends docbook2x \
+    && rm -rf /var/cache/apt/archives /var/lib/apt/lists
+
+// expat
+
+pkgname=${EXPAT_VERSION}-chromeos-${CROS_PKG_ARCH}
+cd /src/libexpat*/expat \
+    && ./buildconf.sh \
+    && LDFLAGS=${CROS_NATIVE_LDFLAGS} ./configure \
+        --prefix=${CROS_TARGET_PREFIX} \
+        --libdir=${CROS_TARGET_LIB} \
+        --build=${CROS_HOST} \
+        --host=${CROS_TARGET} \
+        --target=${CROS_TARGET} \
+        --disable-static \
+    && make -j ${CROS_CORES} \
+    && find . -name '*.so.*' -print | xargs ${CROS_TARGET}-strip -S \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && ${CROS_TARGET}-strip ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_PREFIX}/bin/xmlwf \
+    && cd ${CROS_HOST_DEST}/${pkgname} \
+    && sh ../create_package.sh \
+    && rm -rf ${CROS_HOST_DEST}/${pkgname}
