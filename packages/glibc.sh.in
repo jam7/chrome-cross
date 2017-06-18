@@ -83,8 +83,8 @@ rm usr/local/${LOCALLIB}/libmvec.a
 find usr/local/${LOCALLIB}/ -type f | xargs ${CROS_HOST_PREFIX}/${CROS_TARGET}/bin/strip -S
 
 #ifdef CHROMEBREW_ARMV8
-rm usr/local/${LOCALLIB}/ld-linux-armhf.so.3
-ln -s /${LIB}/ld-linux-armhf.so.3 usr/local/${LOCALLIB}/ld-linux-armhf.so.3
+rm usr/local/${LOCALLIB}/ld-linux-aarch64.so.1
+ln -s /${LIB}/ld-linux-aarch64.so.1 usr/local/${LOCALLIB}/ld-linux-aarch64.so.1
 #endif
 #ifdef CHROMEBREW_ARMV7
 rm usr/local/${LOCALLIB}/ld-linux-armhf.so.3
