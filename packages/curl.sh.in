@@ -1,0 +1,40 @@
+// native compilation
+
+#include "../env.docker"
+
+// prepare sources
+
+CURL_VERSION="curl-7.54.1"
+
+set -x
+cd /src \
+    && wget -cq "https://curl.haxx.se/download/${CURL_VERSION}.tar.gz" \
+    && tar xpf ${CURL_VERSION}.tar.gz
+[ "$?" != "0" ] && exit 1
+
+// zlib, openssl and libssh2
+
+cd ${CROS_HOST_PREFIX}/${CROS_TARGET} \
+    && tar xfp /dist/zlib*${CROS_PKG_ARCH}*.tar.xz \
+    && tar xfp /dist/openssl*${CROS_PKG_ARCH}*.tar.xz \
+    && tar xfp /dist/libssh2*${CROS_PKG_ARCH}*.tar.xz
+
+// curl
+
+pkgname=${CURL_VERSION}-chromeos-${CROS_PKG_ARCH}
+cd /src/${CURL_VERSION} \
+    && LIBS="-lssh2 -lssl -lcrypto -lz" LDFLAGS=${CROS_NATIVE_LDFLAGS} ./configure \
+        --prefix=${CROS_TARGET_PREFIX} \
+        --build=${CROS_HOST} \
+        --host=${CROS_TARGET} \
+        --target=${CROS_TARGET} \
+        --with-zlib=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
+        --with-ssl=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
+        --with-libssh2=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
+        --disable-static \
+    && make -j ${CROS_CORES} \
+    && find . -name '*.so.*' -print | xargs ${CROS_TARGET}-strip -S \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && cd ${CROS_HOST_DEST}/${pkgname} \
+    && sh ../create_package.sh \
+    && rm -rf ${CROS_HOST_DEST}/${pkgname}
