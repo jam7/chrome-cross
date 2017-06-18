@@ -4,35 +4,43 @@
 
 // prepare sources
 
+OPENSSL_TARFILE="OpenSSL_1_0_2l.tar.gz"
 OPENSSL_VERSION="openssl-1.0.2l"
 
 set -x
 cd /src \
-    && wget -q "https://github.com/openssl/openssl/archive/OpenSSL_1_0_2l.tar.gz" \
-    && tar xfk *.tar*
+    && wget -cq "https://github.com/openssl/openssl/archive/${OPENSSL_TARFILE}" \
+    && tar xpf ${OPENSSL_TARFILE}
 [ "$?" != "0" ] && exit 1
+
+// zlib
+
+cd ${CROS_HOST_PREFIX}/${CROS_TARGET} \
+    && tar xfp /dist/zlib*${CROS_PKG_ARCH}*.tar.xz
 
 // openssl
 
 #ifdef CHROMEBREW_ARMV8
-ENV OPENSSL_TARGET linux-armv4 -Wa,--noexecstack -march=armv7-a
+ENV OPENSSL_TARGET "linux-armv4 -Wa,--noexecstack -march=armv8-a no-asm"
 #endif
 #ifdef CHROMEBREW_ARMV7
-ENV OPENSSL_TARGET linux-armv4 -Wa,--noexecstack -march=armv7-a
+ENV OPENSSL_TARGET "linux-armv4 -Wa,--noexecstack -march=armv7-a"
 #endif
 #ifdef CHROMEBREW_X86
-ENV OPENSSL_TARGET linux-elf -Wa,--noexecstack
+ENV OPENSSL_TARGET "linux-elf -Wa,--noexecstack"
 #endif
 #ifdef CHROMEBREW_X64
-ENV OPENSSL_TARGET linux-x86_64 -Wa,--noexecstack
+ENV OPENSSL_TARGET "linux-x86_64 -Wa,--noexecstack"
 #endif
 
 pkgname=${OPENSSL_VERSION}-chromeos-${CROS_PKG_ARCH} \
     && cd /src/openssl* \
-    && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib ./Configure \
+    && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib \
+        LDFLAGS=${CROS_NATIVE_LDFLAGS} ./Configure \
         --prefix=${CROS_TARGET_PREFIX} \
         --openssldir=/etc/ssl \
         shared zlib-dynamic ${OPENSSL_TARGET} \
+        -I${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX}/include \
     && make -j ${CROS_CORES} \
     && find . -name '*.so' -print | xargs ${CROS_TARGET}-strip -S \
     && find . -name '*.so.*' -print | xargs ${CROS_TARGET}-strip -S \
