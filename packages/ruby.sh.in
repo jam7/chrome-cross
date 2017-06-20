@@ -17,7 +17,6 @@ cd /src \
 cd ${CROS_HOST_PREFIX}/${CROS_TARGET} \
     && tar xfp /dist/zlib*${CROS_PKG_ARCH}*.tar.xz \
     && tar xfp /dist/openssl*${CROS_PKG_ARCH}*.tar.xz \
-    && tar xfp /dist/gmp*${CROS_PKG_ARCH}*.tar.xz \
     && tar xfp /dist/ncurses*${CROS_PKG_ARCH}*.tar.xz \
     && tar xfp /dist/readline*${CROS_PKG_ARCH}*.tar.xz \
     && cd ${CROS_HOST_PREFIX}/${CROS_TARGET}/lib \
@@ -33,9 +32,7 @@ pkgname=${RUBY_VERSION}-chromeos-${CROS_PKG_ARCH} \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
         --with-baseruby=ruby \
-        --with-openssl-dir=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
-        --with-zlib-dir=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
-        --with-readline-dir=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
+        --with-opt-dir=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
     && make -j ${CROS_CORES} \
     && find . -name '*.so' -print | xargs ${CROS_TARGET}-strip -S \
     && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
