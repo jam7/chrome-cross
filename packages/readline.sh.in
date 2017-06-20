@@ -26,7 +26,7 @@ cd /src \
 // ncurses
 
 cd ${CROS_HOST_PREFIX}/${CROS_TARGET} \
-    && tar xfp /dist/ncurses*${CROS_PKG_ARCH}*.tar.xz \
+    && tar xfp /dist/ncurses-*${CROS_PKG_ARCH}*.tar.xz \
     && cd ${CROS_HOST_PREFIX}/${CROS_TARGET}/lib \
     && ln -s ${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB}/lib* .
 [ "$?" != "0" ] && exit 1

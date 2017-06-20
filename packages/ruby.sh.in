@@ -17,7 +17,7 @@ cd /src \
 cd ${CROS_HOST_PREFIX}/${CROS_TARGET} \
     && tar xfp /dist/zlib*${CROS_PKG_ARCH}*.tar.xz \
     && tar xfp /dist/openssl*${CROS_PKG_ARCH}*.tar.xz \
-    && tar xfp /dist/ncurses*${CROS_PKG_ARCH}*.tar.xz \
+    && tar xfp /dist/ncurses-*${CROS_PKG_ARCH}*.tar.xz \
     && tar xfp /dist/readline*${CROS_PKG_ARCH}*.tar.xz \
     && cd ${CROS_HOST_PREFIX}/${CROS_TARGET}/lib \
     && ln -s ${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB}/lib* .
