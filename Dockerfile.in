@@ -131,3 +131,16 @@ RUN wget -q "ftp://ftp.gnu.org/gnu/gmp/${GMP_VERSION}.tar.bz2" \
     && rm -rf "$gccdir2" \
     && rm -rf "$glibcdir" \
     && rm -rf "/src/${GMP_VERSION}" "/src/${MPFR_VERSION}" "/src/${MPC_VERSION}" "/src/${ISL_VERSION}" "/src/${CLOOG_VERSION}" "/src/${GLIBC_VERSION}" "/src/${GCC_VERSION}"
+
+// pkg config
+
+RUN echo -e "#!/bin/sh\n\
+\n\
+SYSROOT=${CROS_HOST_PREFIX}/${CROS_TARGET}\n\
+\n\
+export PKG_CONFIG_DIR=\n\
+export PKG_CONFIG_LIBDIR=\${SYSROOT}/usr/local/lib/pkgconfig:\${SYSROOT}/usr/local/lib64/pkgconfig:\${SYSROOT}/usr/local/share/pkgconfig\n\
+export PKG_CONFIG_SYSROOT_DIR=\${SYSROOT}\n\
+\n\
+exec pkg-config \"\$@\"" > /opt/cross/bin/${CROS_TARGET}-pkg-config \
+    && chmod a+x /opt/cross/bin/${CROS_TARGET}-pkg-config
