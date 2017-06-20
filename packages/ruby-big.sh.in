@@ -1,0 +1,46 @@
+// native compilation
+
+#include "../env.docker"
+
+// prepare sources
+
+RUBY_VERSION="ruby-2.4.1"
+
+set -x
+cd /src \
+    && wget -cq "https://cache.ruby-lang.org/pub/ruby/2.4/${RUBY_VERSION}.tar.xz" \
+    && tar xfp ${RUBY_VERSION}.tar*
+[ "$?" != "0" ] && exit 1
+
+// zlib, openssl, gmp, ncurses and readline
+
+cd ${CROS_HOST_PREFIX}/${CROS_TARGET} \
+    && tar xfp /dist/zlib*${CROS_PKG_ARCH}*.tar.xz \
+    && tar xfp /dist/openssl*${CROS_PKG_ARCH}*.tar.xz \
+    && tar xfp /dist/gmp*${CROS_PKG_ARCH}*.tar.xz \
+    && tar xfp /dist/ncurses*${CROS_PKG_ARCH}*.tar.xz \
+    && tar xfp /dist/readline*${CROS_PKG_ARCH}*.tar.xz \
+    && cd ${CROS_HOST_PREFIX}/${CROS_TARGET}/lib \
+    && ln -s ${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB}/lib* .
+[ "$?" != "0" ] && exit 1
+
+// ruby
+
+pkgname=${RUBY_VERSION}-chromeos-${CROS_PKG_ARCH} \
+    && cd /src/${RUBY_VERSION}* \
+    && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib ./configure \
+        --prefix=${CROS_TARGET_PREFIX} \
+        --build=${CROS_HOST} \
+        --host=${CROS_TARGET} \
+        --with-baseruby=ruby \
+        --with-gmp \
+        --with-opt-dir=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
+    && make -j ${CROS_CORES} \
+    && find . -name '*.so' -print | xargs ${CROS_TARGET}-strip -S \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && ${CROS_TARGET}-strip ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_PREFIX}/bin/ruby \
+    && mv ${CROS_HOST_DEST}/${pkgname}/var/lib/gems ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_PREFIX}/lib/ruby \
+    && rm -rf ${CROS_HOST_DEST}/${pkgname}/var \
+    && cd "${CROS_HOST_DEST}/${pkgname}" \
+    && sh ../create_package.sh \
+    && rm -rf "${CROS_HOST_DEST}/${pkgname}"
