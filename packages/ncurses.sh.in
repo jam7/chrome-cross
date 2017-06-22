@@ -22,7 +22,7 @@ ENV NCURSES_TARGET ${CROS_TARGET}
 
 pkgname=${NCURSES_VERSION}-chromeos-${CROS_PKG_ARCH}
 cd /src/${NCURSES_VERSION} \
-    && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib ./configure \
+    && CC=${CROS_TARGET}-gcc CXX=${CROS_TARGET}-g++ RANLIB=${CROS_TARGET}-ranlib ./configure \
         --prefix=${CROS_TARGET_PREFIX} \
         --libdir=${CROS_TARGET_LIB} \
         --build=${CROS_HOST} \
