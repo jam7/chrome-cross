@@ -37,6 +37,7 @@ mkdir -p /build/binutils \
     && cd /build/binutils \
     && CFLAGS="-Wno-error=array-bounds" CXXFLAGS="-Wno-format" LDFLAGS="${CROS_NATIVE_LDFLAGS}" /src/${BINUTILS_VERSION}/configure \
         --prefix=${CROS_TARGET_PREFIX} \
+        --libdir=${CROS_TARGET_LIB} \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
         --target=${CROS_TARGET} \
@@ -59,6 +60,7 @@ mkdir -p /build/binutils \
     && cd /build/binutils \
     && CFLAGS="-Wno-error=array-bounds" LDFLAGS="${CROS_NATIVE_LDFLAGS}" /src/${BINUTILS_VERSION}/configure \
         --prefix=${CROS_TARGET_PREFIX} \
+        --libdir=${CROS_TARGET_LIB} \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
         --target=${CROS_TARGET} \

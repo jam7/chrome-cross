@@ -29,15 +29,17 @@ pkgname=${RUBY_VERSION}-chromeos-${CROS_PKG_ARCH} \
     && cd /src/${RUBY_VERSION}* \
     && CC=${CROS_TARGET}-gcc RANLIB=${CROS_TARGET}-ranlib ./configure \
         --prefix=${CROS_TARGET_PREFIX} \
+        --libdir=${CROS_TARGET_LIB} \
         --build=${CROS_HOST} \
         --host=${CROS_TARGET} \
+        --enable-shared \
         --with-baseruby=ruby \
         --with-opt-dir=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
     && make -j ${CROS_CORES} \
     && find . -name '*.so' -print | xargs ${CROS_TARGET}-strip -S \
     && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
     && ${CROS_TARGET}-strip ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_PREFIX}/bin/ruby \
-    && mv ${CROS_HOST_DEST}/${pkgname}/var/lib/gems ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_PREFIX}/lib/ruby \
+    && mv ${CROS_HOST_DEST}/${pkgname}/var/lib/gems ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_LIB}/ruby \
     && rm -rf ${CROS_HOST_DEST}/${pkgname}/var \
     && cd "${CROS_HOST_DEST}/${pkgname}" \
     && sh ../create_package.sh \

@@ -109,7 +109,8 @@ Packages
 
 Made following packages for armv7, armv8, x64 and x86.
 
-    linuxheaders, binutils, glibc, glibc219, gmp, mpfr, mpc, isl, cloog, gcc, zlib, openssl, libssh2, curl, expat, git, ncurses, readline and ruby
+ - linuxheaders, binutils, glibc219, glibc223, gmp, mpfr, mpc, isl, cloog and gcc
+ - zlib, openssl, libssh2, curl, expat, git, ncurses, readline and ruby
 
 Other packages
 --------------
