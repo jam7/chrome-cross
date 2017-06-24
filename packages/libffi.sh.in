@@ -1,0 +1,33 @@
+// native compilation
+
+#include "../env.docker"
+
+// prepare sources
+
+LIBFFI_VERSION="libffi-3.2.1"
+LIBFFI_PKGNAME=${LIBFFI_VERSION}
+
+set -x
+cd /src \
+    && wget -cq "ftp://sourceware.org/pub/libffi/${LIBFFI_VERSION}.tar.gz" \
+    && tar xfp ${LIBFFI_VERSION}.tar*
+[ "$?" != "0" ] && exit 1
+
+// libffi
+
+pkgname=${LIBFFI_PKGNAME}-chromeos-${CROS_PKG_ARCH} \
+    && cd /src/${LIBFFI_VERSION}* \
+    && LDFLAGS=${CROS_NATIVE_LDFLAGS} ./configure \
+        --prefix=${CROS_TARGET_PREFIX} \
+        --libdir=${CROS_TARGET_LIB} \
+        --build=${CROS_HOST} \
+        --host=${CROS_TARGET} \
+        --with-internal-glib \
+        --disable-static \
+        --with-pc-path=/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig:/usr/local/share/pkgconfig \
+    && make -j ${CROS_CORES} \
+    && find . -name 'lib*.so.*' -print | xargs ${CROS_TARGET}-strip -S \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install-strip \
+    && cd "${CROS_HOST_DEST}/${pkgname}" \
+    && sh ../create_package.sh \
+    && rm -rf "${CROS_HOST_DEST}/${pkgname}"
