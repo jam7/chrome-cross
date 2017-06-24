@@ -1,0 +1,28 @@
+// native compilation
+
+#include "../env.docker"
+
+// prepare sources
+
+MAKE_VERSION="make-4.2"
+
+set -x
+cd /src \
+    && wget -cq "ftp://ftp.gnu.org/gnu/make/${MAKE_VERSION}.tar.bz2" \
+    && tar xfp ${MAKE_VERSION}.tar*
+[ "$?" != "0" ] && exit 1
+
+// make
+
+pkgname=${MAKE_VERSION}-chromeos-${CROS_PKG_ARCH} \
+    && cd /src/${MAKE_VERSION}* \
+    && LDFLAGS=${CROS_NATIVE_LDFLAGS} ./configure \
+        --prefix=${CROS_TARGET_PREFIX} \
+        --libdir=${CROS_TARGET_LIB} \
+        --build=${CROS_HOST} \
+        --host=${CROS_TARGET} \
+    && make -j ${CROS_CORES} \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install-strip \
+    && cd "${CROS_HOST_DEST}/${pkgname}" \
+    && sh ../create_package.sh \
+    && rm -rf "${CROS_HOST_DEST}/${pkgname}"
