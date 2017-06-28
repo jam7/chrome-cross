@@ -36,6 +36,28 @@ BINARIES_ARMV8 = $(BINARIES:%=cross-armv8/%.image)
 BINARIES_X64 = $(BINARIES:%=cross-x64/%.image)
 BINARIES_X86 = $(BINARIES:%=cross-x86/%.image)
 
+# dependencies for both toolchains and binaries
+
+deps = cloog curl gcc git glib isl libssh2 mpc mpfr openssl readline ruby_big ruby
+cloog_DEPS = gmp isl
+curl_DEPS = zlib openssl libssh2
+gcc_DEPS = gmp mpfr mpc isl cloog
+git_DEPS = zlib openssl libssh2 curl expat
+glib_DEPS = zlib libffi
+isl_DEPS = gmp
+libssh2_DEPS = zlib openssl
+mpc_DEPS = gmp mpfr
+mpfr_DEPS = gmp
+openssl_DEPS = zlib
+readline_DEPS = ncurses
+ruby_big_DEPS = zlib openssl gmp ncurses readline
+ruby_DEPS = zlib openssl ncurses readline
+.SECONDEXPANSION:
+$(foreach dep,$(deps),cross-armv7/$(dep).image) : $$(patsubst %,cross-armv7/%.image,$$($$(basename $$(notdir $$@))_DEPS))
+$(foreach dep,$(deps),cross-armv8/$(dep).image) : $$(patsubst %,cross-armv8/%.image,$$($$(basename $$(notdir $$@))_DEPS))
+$(foreach dep,$(deps),cross-x64/$(dep).image) : $$(patsubst %,cross-x64/%.image,$$($$(basename $$(notdir $$@))_DEPS))
+$(foreach dep,$(deps),cross-x86/$(dep).image) : $$(patsubst %,cross-x86/%.image,$$($$(basename $$(notdir $$@))_DEPS))
+
 usage:
 	@echo
 	@echo "In order to make cross compiling environment on docker, type"
