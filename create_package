@@ -1,8 +1,32 @@
 #!/bin/bash
+
+case $1 in
+"-g") USE_GZIP=1;;
+esac
+
+STRIP=@STRIP@
+
 DIRNAME=${PWD##*/}
 
 XZ_OPT=${XZ_OPT-"-7e"}
 export XZ_OPT
+
+GZIP=${GZIP-"-9"}
+export GZIP
+
+# strip libraries
+find . -type f \( -name 'lib*.a' -o -name 'lib*.so*' \) -print | xargs -r chmod u+w
+find . -type f \( -name 'lib*.a' -o -name 'lib*.so*' \) -print | xargs -r sh -c 'for i in "$0" "$@"; do case "$(head -c 4 $i)" in ?ELF|\!?ar) echo "$i";; esac ; done' | xargs -r $STRIP -S
+
+# strip binaries
+find . -type f -perm /111 -print | sed -e '/lib.*\.a$/d' -e '/lib.*\.so/d' | xargs -r chmod u+w
+find . -type f -perm /111 -print | sed -e '/lib.*\.a$/d' -e '/lib.*\.so/d' | xargs -r sh -c 'for i in "$0" "$@"; do case "$(head -c 4 $i)" in ?ELF) echo "$i";; esac ; done' | xargs -r $STRIP
+
+# compress manuals
+test -d "${PWD}/usr/local/man" && compressdoc --gzip -9 "${PWD}/usr/local/man"
+test -d "${PWD}/usr/local/info" && compressdoc --gzip -9 "${PWD}/usr/local/info"
+test -d "${PWD}/usr/local/share/man" && compressdoc --gzip -9 "${PWD}/usr/local/share/man"
+test -d "${PWD}/usr/local/share/info" && compressdoc --gzip -9 "${PWD}/usr/local/share/info"
 
 echo creating file list
 find . -type f > ../filelist && find . -type l >> ../filelist && cut -c2- ../filelist > filelist
@@ -14,9 +38,12 @@ echo removing temporary files
 rm dlistcut ../dlist ../filelist
 
 echo building binary package
-tar -cJf ../$DIRNAME.tar.xz *
-sha1sum ../$DIRNAME.tar.xz > ../$DIRNAME.tar.xz.sha1
-sha256sum ../$DIRNAME.tar.xz > ../$DIRNAME.tar.xz.sha256
+case $USE_GZIP in
+1) TAR_OPT="-czf" EXT="gz";;
+*) TAR_OPT="-cJf" EXT="xz";;
+esac
 
-echo finished
-cat ../$DIRNAME.tar.xz.sha1
+tar $TAR_OPT ../$DIRNAME.tar.$EXT *
+cd ..
+sha1sum $DIRNAME.tar.$EXT > $DIRNAME.tar.$EXT.sha1
+sha256sum $DIRNAME.tar.$EXT > $DIRNAME.tar.$EXT.sha256

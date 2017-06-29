@@ -1,6 +1,6 @@
 ORG = jam7
 NPROCS = `nproc`
-VERSION = v1.7
+VERSION = v1.8
 
 PACKAGES = $(TOOLCHAINS) $(BINARIES)
 PACKAGES_SH_ARMV7 = $(TOOLCHAINS_SH_ARMV7) $(BINARIES_SH_ARMV7)
@@ -145,11 +145,6 @@ armv8-binaries: $(BINARIES_ARMV8)
 x64-binaries: $(BINARIES_X64)
 x86-binaries: $(BINARIES_X86)
 
-$(PACKAGES_ARMV7) $(PACKAGES_ARMV8) $(PACKAGES_X64) $(PACKAGES_X86): dist/create_package.sh
-
-dist/create_package.sh: create_package.sh
-	cp $? $@
-
 #
 # Create cross compiling environment by
 #
@@ -157,52 +152,84 @@ dist/create_package.sh: create_package.sh
 cross: cross-armv7 cross-armv8 cross-x64 cross-x86
 
 cross-armv7: cross-armv7/image
-cross-armv7/image:cross-armv7/Dockerfile
+cross-armv8: cross-armv8/image
+cross-x64: cross-x64/image
+cross-x86: cross-x86/image
+
+cross-armv7/image:cross-armv7/docker/Dockerfile cross-armv7/docker/compressdoc cross-armv7/docker/create_package
 	docker build -t $(ORG)/cross-armv7 \
 	       --build-arg http_proxy=$(http_proxy) \
 	       --build-arg https_proxy=$(https_proxy) \
 	       --build-arg ftp_proxy=$(ftp_proxy) \
 	       --build-arg NPROCS=$(NPROCS) \
-		cross-armv7
+		cross-armv7/docker
 	touch $@
-cross-armv7/Dockerfile: Dockerfile.in env.docker
-	cpp -DCHROMEBREW_ARMV7 -Ulinux -P -o $@ Dockerfile.in
 
-cross-armv8: cross-armv8/image
-cross-armv8/image:cross-armv8/Dockerfile
+cross-armv8/image:cross-armv8/docker/Dockerfile cross-armv8/docker/compressdoc cross-armv8/docker/create_package
 	docker build -t $(ORG)/cross-armv8 \
 	       --build-arg http_proxy=$(http_proxy) \
 	       --build-arg https_proxy=$(https_proxy) \
 	       --build-arg ftp_proxy=$(ftp_proxy) \
 	       --build-arg NPROCS=$(NPROCS) \
-		cross-armv8
+		cross-armv8/docker
 	touch $@
-cross-armv8/Dockerfile: Dockerfile.in env.docker
-	cpp -DCHROMEBREW_ARMV8 -Ulinux -P -o $@ Dockerfile.in
 
-cross-x64: cross-x64/image
-cross-x64/image: cross-x64/Dockerfile
+cross-x64/image: cross-x64/docker/Dockerfile cross-x64/docker/compressdoc cross-x64/docker/create_package
 	docker build -t $(ORG)/cross-x64 \
 	       --build-arg http_proxy=$(http_proxy) \
 	       --build-arg https_proxy=$(https_proxy) \
 	       --build-arg ftp_proxy=$(ftp_proxy) \
 	       --build-arg NPROCS=$(NPROCS) \
-		cross-x64
+		cross-x64/docker
 	touch $@
-cross-x64/Dockerfile: Dockerfile.in env.docker
-	cpp -DCHROMEBREW_X64 -Ulinux -P -o $@ Dockerfile.in
 
-cross-x86: cross-x86/image
-cross-x86/image: cross-x86/Dockerfile
+cross-x86/image: cross-x86/docker/Dockerfile cross-x86/docker/compressdoc cross-x86/docker/create_package
 	docker build -t $(ORG)/cross-x86 \
 	       --build-arg http_proxy=$(http_proxy) \
 	       --build-arg https_proxy=$(https_proxy) \
 	       --build-arg ftp_proxy=$(ftp_proxy) \
 	       --build-arg NPROCS=$(NPROCS) \
-		cross-x86
+		cross-x86/docker
 	touch $@
-cross-x86/Dockerfile: Dockerfile.in env.docker
+
+cross-armv7/docker/Dockerfile: Dockerfile.in env.docker
+	mkdir -p $(dir $@)
+	cpp -DCHROMEBREW_ARMV7 -Ulinux -P -o $@ Dockerfile.in
+cross-armv8/docker/Dockerfile: Dockerfile.in env.docker
+	mkdir -p $(dir $@)
+	cpp -DCHROMEBREW_ARMV8 -Ulinux -P -o $@ Dockerfile.in
+cross-x64/docker/Dockerfile: Dockerfile.in env.docker
+	mkdir -p $(dir $@)
+	cpp -DCHROMEBREW_X64 -Ulinux -P -o $@ Dockerfile.in
+cross-x86/docker/Dockerfile: Dockerfile.in env.docker
+	mkdir -p $(dir $@)
 	cpp -DCHROMEBREW_X86 -Ulinux -P -o $@ Dockerfile.in
+
+cross-armv7/docker/compressdoc: compressdoc
+	mkdir -p $(dir $@)
+	cp $? $@
+cross-armv8/docker/compressdoc: compressdoc
+	mkdir -p $(dir $@)
+	cp $? $@
+cross-x64/docker/compressdoc: compressdoc
+	mkdir -p $(dir $@)
+	cp $? $@
+cross-x86/docker/compressdoc: compressdoc
+	mkdir -p $(dir $@)
+	cp $? $@
+
+cross-armv7/docker/create_package: create_package
+	mkdir -p $(dir $@)
+	cp $? $@
+cross-armv8/docker/create_package: create_package
+	mkdir -p $(dir $@)
+	cp $? $@
+cross-x64/docker/create_package: create_package
+	mkdir -p $(dir $@)
+	cp $? $@
+cross-x86/docker/create_package: create_package
+	mkdir -p $(dir $@)
+	cp $? $@
 
 dockertag:
 	docker tag $(ORG)/cross-armv7 $(ORG)/cross-armv7:$(VERSION)

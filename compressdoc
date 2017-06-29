@@ -130,7 +130,7 @@ Note about compression:
   Well, my P4-2.5GHz does not even let me notice this... :-)
 
 EOT
-) | less
+)
 }
 
 # This function checks that the man page is unique amongst bzip2'd,
@@ -489,10 +489,12 @@ for DIR in $MAN_DIR; do
         # Compress the file with the given compression ratio, if needed
         case $COMP_SUF in
           *bz2)
+            chmod u+w "$FILE"
             bzip2 ${COMP_LVL} "$FILE" && chmod 644 "${FILE}${COMP_SUF}"
             echo "Compressed $FILE" > $DEST_FD1
             ;;
           *gz)
+            chmod u+w "$FILE"
             gzip ${COMP_LVL} "$FILE" && chmod 644 "${FILE}${COMP_SUF}"
             echo "Compressed $FILE" > $DEST_FD1
             ;;

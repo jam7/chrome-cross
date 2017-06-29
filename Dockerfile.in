@@ -144,3 +144,10 @@ export PKG_CONFIG_SYSROOT_DIR=\${SYSROOT}\n\
 \n\
 exec pkg-config \"\$@\"" > /opt/cross/bin/${CROS_TARGET}-pkg-config \
     && chmod a+x /opt/cross/bin/${CROS_TARGET}-pkg-config
+
+// add compressdoc and create_package
+COPY compressdoc /opt/cross/bin/
+COPY create_package /opt/cross/bin/
+RUN chmod a+x /opt/cross/bin/compressdoc \
+    && chmod a+x /opt/cross/bin/create_package \
+    && sed -i /opt/cross/bin/create_package -e "/@STRIP@/s//${CROS_TARGET}-strip/"
