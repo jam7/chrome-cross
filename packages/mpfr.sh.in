@@ -32,7 +32,7 @@ mkdir -p /build/mpfr \
         --with-gmp-include=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX}/include \
         --with-gmp-lib=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB} \
     && make -j ${CROS_CORES} \
-    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install-strip \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
     && cd ${CROS_HOST_DEST}/${pkgname} \
-    && sh ../create_package.sh \
+    && create_package \
     && rm -rf ${CROS_HOST_DEST}/${pkgname}

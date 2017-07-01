@@ -31,9 +31,7 @@ cd /src/libexpat*/expat \
         --target=${CROS_TARGET} \
         --disable-static \
     && make -j ${CROS_CORES} \
-    && find . -name '*.so.*' -print | xargs ${CROS_TARGET}-strip -S \
     && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
-    && ${CROS_TARGET}-strip ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_PREFIX}/bin/xmlwf \
     && cd ${CROS_HOST_DEST}/${pkgname} \
-    && sh ../create_package.sh \
+    && create_package \
     && rm -rf ${CROS_HOST_DEST}/${pkgname}

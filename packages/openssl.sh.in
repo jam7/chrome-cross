@@ -46,12 +46,9 @@ pkgname=${OPENSSL_VERSION}-chromeos-${CROS_PKG_ARCH} \
         shared zlib-dynamic ${OPENSSL_TARGET} \
         -I${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX}/include ${CROS_NATIVE_LDFLAGS} \
     && make -j ${CROS_CORES} \
-    && find . -name '*.so' -print | xargs ${CROS_TARGET}-strip -S \
-    && find . -name '*.so.*' -print | xargs ${CROS_TARGET}-strip -S \
     && make INSTALL_PREFIX=${CROS_HOST_DEST}/${pkgname} install \
     && mv ${CROS_HOST_DEST}/${pkgname}/etc/ssl/man ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_PREFIX} \
     && rm -rf ${CROS_HOST_DEST}/${pkgname}/etc \
-    && ${CROS_TARGET}-strip ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_PREFIX}/bin/openssl \
     && cd "${CROS_HOST_DEST}/${pkgname}" \
-    && sh ../create_package.sh \
+    && create_package \
     && rm -rf "${CROS_HOST_DEST}/${pkgname}"

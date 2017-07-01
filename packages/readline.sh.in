@@ -44,8 +44,7 @@ cd /src/${READLINE_TAR_VERSION} \
         --disable-static \
         --with-curses \
     && make -j ${CROS_CORES} \
-    && find . -name '*.so.*' -print | xargs ${CROS_TARGET}-strip -S \
     && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
     && cd ${CROS_HOST_DEST}/${pkgname} \
-    && sh ../create_package.sh \
+    && create_package \
     && rm -rf ${CROS_HOST_DEST}/${pkgname}

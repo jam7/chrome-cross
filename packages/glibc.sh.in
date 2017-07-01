@@ -79,9 +79,6 @@ rm usr/local/${LOCALLIB}/libBrokenLocale.a
 rm usr/local/${LOCALLIB}/libpthread.a
 rm usr/local/${LOCALLIB}/libmvec.a
 
-// strip debug symbol of all files under lib
-find usr/local/${LOCALLIB}/ -type f | xargs ${CROS_HOST_PREFIX}/${CROS_TARGET}/bin/strip -S
-
 #ifdef CHROMEBREW_ARMV8
 rm usr/local/${LOCALLIB}/ld-linux-aarch64.so.1
 ln -s /${LIB}/ld-linux-aarch64.so.1 usr/local/${LOCALLIB}/ld-linux-aarch64.so.1
@@ -176,5 +173,5 @@ rm usr/local/${LOCALLIB}/libthread_db[.-]*
 rm usr/local/${LOCALLIB}/libutil[.-]*
 
 cd ${CROS_HOST_DEST}/${pkgname} \
-    && sh ../create_package.sh \
+    && create_package \
     && rm -rf ${CROS_HOST_DEST}/${pkgname}

@@ -42,8 +42,7 @@ pkgname=${GIT_VERSION}-chromeos-${CROS_PKG_ARCH} \
         --with-expat=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
         --without-tcltk \
     && make all \
-    && STRIP=${CROS_TARGET}-strip make strip \
     && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
     && cd "${CROS_HOST_DEST}/${pkgname}" \
-    && sh ../create_package.sh \
+    && create_package \
     && rm -rf "${CROS_HOST_DEST}/${pkgname}"

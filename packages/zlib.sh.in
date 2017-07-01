@@ -19,9 +19,8 @@ cd /src/${ZLIB_VERSION} \
     && LDFLAGS=${CROS_NATIVE_LDFLAGS} CC=${CROS_TARGET}-gcc ./configure \
         --prefix=${CROS_TARGET_PREFIX} --libdir=${CROS_TARGET_LIB} \
     && make -j ${CROS_CORES} \
-    && find . -name '*.so.*' -print | xargs ${CROS_TARGET}-strip -S \
     && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
     && rm ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_LIB}/libz.a \
     && cd "${CROS_HOST_DEST}/${pkgname}" \
-    && sh ../create_package.sh \
+    && create_package \
     && rm -rf "${CROS_HOST_DEST}/${pkgname}"

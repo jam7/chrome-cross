@@ -26,8 +26,7 @@ pkgname=${LIBFFI_PKGNAME}-chromeos-${CROS_PKG_ARCH} \
         --disable-static \
         --with-pc-path=/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig:/usr/local/share/pkgconfig \
     && make -j ${CROS_CORES} \
-    && find . -name 'lib*.so.*' -print | xargs ${CROS_TARGET}-strip -S \
-    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install-strip \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
     && cd "${CROS_HOST_DEST}/${pkgname}" \
-    && sh ../create_package.sh \
+    && create_package \
     && rm -rf "${CROS_HOST_DEST}/${pkgname}"

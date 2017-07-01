@@ -52,8 +52,8 @@ mkdir -p /build/gcc \
         --with-cloog-lib=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB} \
         ${CROS_NATIVE_GCC_OPT} \
     && make -j ${CROS_CORES} \
-    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install-strip \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
     && find ${CROS_HOST_DEST}/${pkgname}${CROS_TARGET_LIB} -maxdepth 1 -name '*.a' | grep -v nonshared.a | xargs rm \
     && cd ${CROS_HOST_DEST}/${pkgname} \
-    && sh ../create_package.sh \
+    && create_package \
     && rm -rf ${CROS_HOST_DEST}/${pkgname}

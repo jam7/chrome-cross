@@ -48,9 +48,9 @@ mkdir -p /build/binutils \
         --disable-werror \
         ${CROS_NATIVE_GCC_OPT} \
     && make -j ${CROS_CORES} \
-    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install-strip \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
     && cd ${CROS_HOST_DEST}/${pkgname} \
-    && sh ../create_package.sh \
+    && create_package \
     && rm -rf ${CROS_HOST_DEST}/${pkgname}
 #endif
 #ifdef USE_LIB64
@@ -71,9 +71,9 @@ mkdir -p /build/binutils \
         --disable-werror \
         ${CROS_NATIVE_GCC_OPT} \
     && make -j ${CROS_CORES} \
-    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install-strip \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
     && ln -s ../lib ${CROS_HOST_DEST}/${pkgname}/${CROS_TARGET_PREFIX}/${CROS_TARGET}/lib64 /*1*/ \
     && cd ${CROS_HOST_DEST}/${pkgname} \
-    && sh ../create_package.sh \
+    && create_package \
     && rm -rf ${CROS_HOST_DEST}/${pkgname}
 #endif

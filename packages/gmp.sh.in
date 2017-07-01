@@ -24,7 +24,7 @@ mkdir -p /build/gmp \
         --disable-static \
         --with-sysroot=${CROS_HOST_PREFIX}/${CROS_TARGET} \
     && make -j ${CROS_CORES} \
-    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install-strip \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
     && cd ${CROS_HOST_DEST}/${pkgname} \
-    && sh ../create_package.sh \
+    && create_package \
     && rm -rf ${CROS_HOST_DEST}/${pkgname}

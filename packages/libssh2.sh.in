@@ -34,8 +34,7 @@ cd /src/${LIBSSH2_VERSION} \
         --with-libssl-prefix=${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_PREFIX} \
         --disable-static \
     && make -j ${CROS_CORES} \
-    && find . -name '*.so.*' -print | xargs ${CROS_TARGET}-strip -S \
     && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
     && cd "${CROS_HOST_DEST}/${pkgname}" \
-    && sh ../create_package.sh \
+    && create_package \
     && rm -rf "${CROS_HOST_DEST}/${pkgname}"
