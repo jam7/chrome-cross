@@ -52,11 +52,6 @@ openssl_DEPS = zlib
 readline_DEPS = ncurses
 ruby_big_DEPS = zlib openssl gmp ncurses readline
 ruby_DEPS = zlib openssl ncurses readline
-.SECONDEXPANSION:
-$(foreach dep,$(deps),cross-armv7/$(dep).image) : $$(patsubst %,cross-armv7/%.image,$$($$(basename $$(notdir $$@))_DEPS))
-$(foreach dep,$(deps),cross-armv8/$(dep).image) : $$(patsubst %,cross-armv8/%.image,$$($$(basename $$(notdir $$@))_DEPS))
-$(foreach dep,$(deps),cross-x64/$(dep).image) : $$(patsubst %,cross-x64/%.image,$$($$(basename $$(notdir $$@))_DEPS))
-$(foreach dep,$(deps),cross-x86/$(dep).image) : $$(patsubst %,cross-x86/%.image,$$($$(basename $$(notdir $$@))_DEPS))
 
 usage:
 	@echo
@@ -144,6 +139,13 @@ armv7-binaries: $(BINARIES_ARMV7)
 armv8-binaries: $(BINARIES_ARMV8)
 x64-binaries: $(BINARIES_X64)
 x86-binaries: $(BINARIES_X86)
+
+# dependencies expansion
+.SECONDEXPANSION:
+$(foreach dep,$(deps),cross-armv7/$(dep).image) : $$(patsubst %,cross-armv7/%.image,$$($$(basename $$(notdir $$@))_DEPS))
+$(foreach dep,$(deps),cross-armv8/$(dep).image) : $$(patsubst %,cross-armv8/%.image,$$($$(basename $$(notdir $$@))_DEPS))
+$(foreach dep,$(deps),cross-x64/$(dep).image) : $$(patsubst %,cross-x64/%.image,$$($$(basename $$(notdir $$@))_DEPS))
+$(foreach dep,$(deps),cross-x86/$(dep).image) : $$(patsubst %,cross-x86/%.image,$$($$(basename $$(notdir $$@))_DEPS))
 
 #
 # Create cross compiling environment by
@@ -242,7 +244,6 @@ dockerpush:
 	docker push $(ORG)/cross-armv8
 	docker push $(ORG)/cross-x64
 	docker push $(ORG)/cross-x86
-
 
 FORCE:
 .PHONY: all clean FORCE armv7 armv8 x64 x86 armv7-toolchains armv8-toolchains x64-toolchains x86-toolchains armv7-binaries armv8-binaries x64-binaries x86-binaries cross
