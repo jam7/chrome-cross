@@ -101,7 +101,7 @@ cross-armv7/%.image: cross-armv7/%.sh
 		-e ftp_proxy=${ftp_proxy} \
 		-e NPROCS=${NPROCS} \
 		-e NOSTRIP=${NOSTRIP} \
-		$(ORG)/cross-armv7 /bin/bash /work/$<
+		$(ORG)/cross-armv7:${VERSION} /bin/bash /work/$<
 	touch $@
 
 cross-armv8/%.image: cross-armv8/%.sh
@@ -111,7 +111,7 @@ cross-armv8/%.image: cross-armv8/%.sh
 		-e ftp_proxy=${ftp_proxy} \
 		-e NPROCS=${NPROCS} \
 		-e NOSTRIP=${NOSTRIP} \
-		$(ORG)/cross-armv8 /bin/bash /work/$<
+		$(ORG)/cross-armv8:${VERSION} /bin/bash /work/$<
 	touch $@
 
 cross-x64/%.image: cross-x64/%.sh
@@ -121,7 +121,7 @@ cross-x64/%.image: cross-x64/%.sh
 		-e ftp_proxy=${ftp_proxy} \
 		-e NPROCS=${NPROCS} \
 		-e NOSTRIP=${NOSTRIP} \
-		$(ORG)/cross-x64 /bin/bash /work/$<
+		$(ORG)/cross-x64:${VERSION} /bin/bash /work/$<
 	touch $@
 
 cross-x86/%.image: cross-x86/%.sh
@@ -131,7 +131,7 @@ cross-x86/%.image: cross-x86/%.sh
 		-e ftp_proxy=${ftp_proxy} \
 		-e NPROCS=${NPROCS} \
 		-e NOSTRIP=${NOSTRIP} \
-		$(ORG)/cross-x86 /bin/bash /work/$<
+		$(ORG)/cross-x86:${VERSION} /bin/bash /work/$<
 	touch $@
 
 armv7: $(PACKAGES_ARMV7)
