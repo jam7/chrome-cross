@@ -1,0 +1,35 @@
+// native compilation
+
+#include "../env.docker"
+
+// prepare sources
+
+PKGCONFIG_VERSION="pkg-config-0.29.2"
+PKGCONFIG_PKGNAME="pkgconfig-0.29.2"
+
+set -x
+cd /src \
+    && wget -cq "http://pkgconfig.freedesktop.org/releases/${PKGCONFIG_VERSION}.tar.gz" \
+    && tar xfp ${PKGCONFIG_VERSION}.tar*
+[ "$?" != "0" ] && exit 1
+
+// pkg-config
+
+pkgname=${PKGCONFIG_PKGNAME}-chromeos-${CROS_PKG_ARCH} \
+    && cd /src/${PKGCONFIG_VERSION}* \
+    && LDFLAGS=${CROS_NATIVE_LDFLAGS} ./configure \
+        --prefix=${CROS_TARGET_PREFIX} \
+        --libdir=${CROS_TARGET_LIB} \
+        --build=${CROS_HOST} \
+        --host=${CROS_TARGET} \
+        --with-internal-glib \
+        --with-pc-path=/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig:/usr/local/share/pkgconfig \
+        glib_cv_stack_grows=no \
+        glib_cv_uscore=no \
+        ac_cv_func_posix_getpwuid_r=yes \
+        ac_cv_func_posix_getgrgid_r=yes \
+    && make -j ${CROS_CORES} \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && cd "${CROS_HOST_DEST}/${pkgname}" \
+    && create_package \
+    && rm -rf "${CROS_HOST_DEST}/${pkgname}"

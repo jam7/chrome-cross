@@ -1,0 +1,42 @@
+// native compilation
+
+#include "../env.docker"
+
+// prepare sources
+
+GLIB_VERSION="glib-2.40.2"
+GLIB_PKGNAME=${GLIB_VERSION}
+
+set -x
+cd /src \
+    && wget -cq "https://ftp.gnome.org/pub/gnome/sources/glib/2.40/${GLIB_VERSION}.tar.xz" \
+    && tar xfp ${GLIB_VERSION}.tar*
+[ "$?" != "0" ] && exit 1
+
+// zlib and libffi
+
+cd ${CROS_HOST_PREFIX}/${CROS_TARGET} \
+    && tar xfp /dist/zlib*${CROS_PKG_ARCH}*.tar.xz \
+    && tar xfp /dist/libffi*${CROS_PKG_ARCH}*.tar.xz \
+    && cd ${CROS_HOST_PREFIX}/${CROS_TARGET}/lib \
+    && ln -s ${CROS_HOST_PREFIX}/${CROS_TARGET}${CROS_TARGET_LIB}/lib* .
+[ "$?" != "0" ] && exit 1
+
+// glib
+
+pkgname=${GLIB_PKGNAME}-chromeos-${CROS_PKG_ARCH} \
+    && cd /src/${GLIB_VERSION}* \
+    && LDFLAGS=${CROS_NATIVE_LDFLAGS} ./configure \
+        --prefix=${CROS_TARGET_PREFIX} \
+        --libdir=${CROS_TARGET_LIB} \
+        --build=${CROS_HOST} \
+        --host=${CROS_TARGET} \
+        glib_cv_stack_grows=no \
+        glib_cv_uscore=no \
+        ac_cv_func_posix_getpwuid_r=yes \
+        ac_cv_func_posix_getgrgid_r=yes \
+    && make -j ${CROS_CORES} \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && cd "${CROS_HOST_DEST}/${pkgname}" \
+    && create_package \
+    && rm -rf "${CROS_HOST_DEST}/${pkgname}"
