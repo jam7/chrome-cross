@@ -14,13 +14,18 @@ export XZ_OPT
 GZIP=${GZIP-"-9"}
 export GZIP
 
-# strip libraries
-find . -type f \( -name 'lib*.a' -o -name 'lib*.so*' \) -print | xargs -r chmod u+w
-find . -type f \( -name 'lib*.a' -o -name 'lib*.so*' \) -print | xargs -r sh -c 'for i in "$0" "$@"; do case "$(head -c 4 $i)" in ?ELF|\!?ar) echo "$i";; esac ; done' | xargs -r $STRIP -S
+case x$NOSTRIP in
+x)
+    # strip libraries
+    find . -type f \( -name 'lib*.a' -o -name 'lib*.so*' \) -print | xargs -r chmod u+w
+    find . -type f \( -name 'lib*.a' -o -name 'lib*.so*' \) -print | xargs -r sh -c 'for i in "$0" "$@"; do case "$(head -c 4 $i)" in ?ELF|\!?ar) echo "$i";; esac ; done' | xargs -r $STRIP -S
 
-# strip binaries
-find . -type f -perm /111 -print | sed -e '/lib.*\.a$/d' -e '/lib.*\.so/d' | xargs -r chmod u+w
-find . -type f -perm /111 -print | sed -e '/lib.*\.a$/d' -e '/lib.*\.so/d' | xargs -r sh -c 'for i in "$0" "$@"; do case "$(head -c 4 $i)" in ?ELF) echo "$i";; esac ; done' | xargs -r $STRIP
+    # strip binaries
+    find . -type f -perm /111 -print | sed -e '/lib.*\.a$/d' -e '/lib.*\.so/d' | xargs -r chmod u+w
+    find . -type f -perm /111 -print | sed -e '/lib.*\.a$/d' -e '/lib.*\.so/d' | xargs -r sh -c 'for i in "$0" "$@"; do case "$(head -c 4 $i)" in ?ELF) echo "$i";; esac ; done' | xargs -r $STRIP
+    ;;
+*)  ;;
+esac
 
 # compress manuals
 test -d "${PWD}/usr/local/man" && compressdoc --gzip -9 "${PWD}/usr/local/man"

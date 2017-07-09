@@ -104,6 +104,10 @@ isl-0.18-chromeos-armv7l.tar.xz             zlib-1.2.11-chromeos-x86_64.tar.xz.s
 isl-0.18-chromeos-armv7l.tar.xz.sha1
 ```
 
+If you want to not stripped version of binary packages, please type following instead.
+
+    NOSTRIP=yes make armv7 | armv8 | x64 | x86 | all
+
 Packages
 --------
 
@@ -111,6 +115,8 @@ Made following packages for armv7, armv8, x64 and x86.
 
  - linuxheaders, binutils, glibc219, glibc223, gmp, mpfr, mpc, isl, cloog and gcc
  - zlib, openssl, libssh2, curl, expat, git, ncurses, readline and ruby
+
+All of them are stripped and manual/info-compressed by default.
 
 Other packages
 --------------
@@ -145,6 +151,7 @@ Version Hitory
 
 |Version|Description|
 |:---:|---|
+|v1.8|Strip and compress manual/info|
 |v1.7|Add libssh2, git, ruby and others|
 |v1.6|Change to use gcc-4.9.4|
 |v1.5|Change to use gcc-7.1.0|

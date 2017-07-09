@@ -67,7 +67,7 @@ usage:
 .SUFFIXES: .sh.in .sh .image
 
 clean:
-	rm -rf cross-armv7/* cross-x86/* cross-x64/* dist/*
+	rm -rf cross-armv7/* cross-armv8/* cross-x86/* cross-x64/* dist/*
 
 #
 # Create compiled packages by
@@ -97,6 +97,7 @@ cross-armv7/%.image: cross-armv7/%.sh
 		-e https_proxy=${https_proxy} \
 		-e ftp_proxy=${ftp_proxy} \
 		-e NPROCS=${NPROCS} \
+		-e NOSTRIP=${NOSTRIP} \
 		$(ORG)/cross-armv7 /bin/bash /work/$<
 	touch $@
 
@@ -106,6 +107,7 @@ cross-armv8/%.image: cross-armv8/%.sh
 		-e https_proxy=${https_proxy} \
 		-e ftp_proxy=${ftp_proxy} \
 		-e NPROCS=${NPROCS} \
+		-e NOSTRIP=${NOSTRIP} \
 		$(ORG)/cross-armv8 /bin/bash /work/$<
 	touch $@
 
@@ -115,6 +117,7 @@ cross-x64/%.image: cross-x64/%.sh
 		-e https_proxy=${https_proxy} \
 		-e ftp_proxy=${ftp_proxy} \
 		-e NPROCS=${NPROCS} \
+		-e NOSTRIP=${NOSTRIP} \
 		$(ORG)/cross-x64 /bin/bash /work/$<
 	touch $@
 
@@ -124,6 +127,7 @@ cross-x86/%.image: cross-x86/%.sh
 		-e https_proxy=${https_proxy} \
 		-e ftp_proxy=${ftp_proxy} \
 		-e NPROCS=${NPROCS} \
+		-e NOSTRIP=${NOSTRIP} \
 		$(ORG)/cross-x86 /bin/bash /work/$<
 	touch $@
 
