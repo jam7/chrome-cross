@@ -1,0 +1,25 @@
+// native compilation
+
+#include "../env.docker"
+
+ENV XZ_VERSION xz-5.2.3
+
+// prepare sources
+
+set -x
+cd /src \
+    && wget -cq "https://downloads.sourceforge.net/project/lzmautils/${XZ_VERSION}.tar.gz" \
+    && tar xfp ${XZ_VERSION}.tar*
+[ "$?" != "0" ] && exit 1
+
+// zlib
+
+pkgname=${XZ_VERSION}-chromeos-${CROS_PKG_ARCH}
+cd /src/${XZ_VERSION} \
+    && LDFLAGS=${CROS_NATIVE_LDFLAGS} CC=${CROS_TARGET}-gcc ./configure \
+        --prefix=${CROS_TARGET_PREFIX} --libdir=${CROS_TARGET_LIB} --host=${CROS_TARGET} \
+    && make -j ${CROS_CORES} \
+    && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
+    && cd "${CROS_HOST_DEST}/${pkgname}" \
+    && create_package -g \
+    && rm -rf "${CROS_HOST_DEST}/${pkgname}"
