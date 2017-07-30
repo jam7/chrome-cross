@@ -26,7 +26,7 @@ TOOLCHAINS_X86 = $(TOOLCHAINS:%=cross-x86/%.image)
 
 # BINARIES are ordered belong to dependency order
 
-BINARIES = zlib openssl libssh2 curl expat git ncursesw ncurses readline gmp ruby make libffi pkgconfig glib
+BINARIES = zlib openssl libssh2 curl expat git ncursesw ncurses readline gmp ruby make libffi pkgconfig glib xz
 BINARIES_SH_ARMV7 = $(BINARIES:%=cross-armv7/%.sh)
 BINARIES_SH_ARMV8 = $(BINARIES:%=cross-armv8/%.sh)
 BINARIES_SH_X64 = $(BINARIES:%=cross-x64/%.sh)
@@ -38,7 +38,7 @@ BINARIES_X86 = $(BINARIES:%=cross-x86/%.image)
 
 # dependencies for both toolchains and binaries
 
-deps = cloog curl gcc git glib isl libssh2 mpc mpfr openssl pkgconfig readline ruby_big ruby
+deps = cloog curl gcc git glib isl libssh2 mpc mpfr openssl pkgconfig readline ruby_big ruby xz
 cloog_DEPS = gmp isl
 curl_DEPS = zlib openssl libssh2
 gcc_DEPS = gmp mpfr mpc isl cloog
@@ -55,6 +55,7 @@ pkgconfig_DEPS =
 readline_DEPS = ncurses
 ruby_big_DEPS = zlib openssl gmp ncurses readline
 ruby_DEPS = zlib openssl ncurses readline
+xz_DEPS = glib
 
 usage:
 	@echo
