@@ -12,12 +12,13 @@ cd /src \
     && tar xfp ${XZ_VERSION}.tar*
 [ "$?" != "0" ] && exit 1
 
-// zlib
+// xz
 
 pkgname=${XZ_VERSION}-chromeos-${CROS_PKG_ARCH}
 cd /src/${XZ_VERSION} \
     && LDFLAGS=${CROS_NATIVE_LDFLAGS} CC=${CROS_TARGET}-gcc ./configure \
         --prefix=${CROS_TARGET_PREFIX} --libdir=${CROS_TARGET_LIB} --host=${CROS_TARGET} \
+        --disable-static --disable-doc \
     && make -j ${CROS_CORES} \
     && make DESTDIR=${CROS_HOST_DEST}/${pkgname} install \
     && cd "${CROS_HOST_DEST}/${pkgname}" \

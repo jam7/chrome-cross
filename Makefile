@@ -38,7 +38,7 @@ BINARIES_X86 = $(BINARIES:%=cross-x86/%.image)
 
 # dependencies for both toolchains and binaries
 
-deps = cloog curl gcc git glib isl libssh2 mpc mpfr openssl pkgconfig readline ruby_big ruby xz
+deps = cloog curl gcc git glib isl libssh2 mpc mpfr openssl pkgconfig readline ruby_big ruby
 cloog_DEPS = gmp isl
 curl_DEPS = zlib openssl libssh2
 gcc_DEPS = gmp mpfr mpc isl cloog
@@ -55,7 +55,6 @@ pkgconfig_DEPS =
 readline_DEPS = ncurses
 ruby_big_DEPS = zlib openssl gmp ncurses readline
 ruby_DEPS = zlib openssl ncurses readline
-xz_DEPS = glib
 
 usage:
 	@echo
